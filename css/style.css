@@ -796,6 +796,23 @@ body {
 
 .dialogue-actions .btn-filtre { flex: none; padding: 10px 16px; font-size: 0.9rem; }
 
+/* ---- Bandeau d'erreur technique ------------------------------------------ */
+
+#barre-probleme {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  z-index: 90;
+  padding: 10px 14px;
+  border: 1px solid #9E4550;
+  border-radius: 10px;
+  background: #2A1518;
+  color: #F0B5B5;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
 /* ---- Célébration : grande coche verte ----------------------------------- */
 
 /* indispensable : display:grid ci-dessous écraserait l'attribut hidden,
@@ -839,7 +856,16 @@ body {
     min-height: 100vh;
   }
 
-  .dashboard { flex: none; }
+  .dashboard {
+    flex: none;
+    /* espace pour la barre flottante de Safari iOS : sans lui, elle recouvre
+       le bas de la page et les derniers boutons deviennent intouchables */
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .page-liste {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
 
   /* logo → graphique → sociétés → tâches à réaliser, en colonne */
   .rangee-haut {

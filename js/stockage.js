@@ -11,6 +11,26 @@
 const CLE_SOCIETES = 'marktask.societes.v1';
 const CLE_TACHES = 'marktask.taches.v1';
 
+// ---- Erreurs visibles à l'écran ------------------------------------------
+// Sur téléphone, pas de console : toute erreur inattendue s'affiche dans un
+// bandeau rouge en haut de l'écran (un appui le referme).
+
+function signalerProbleme(message) {
+  let barre = document.getElementById('barre-probleme');
+  if (!barre) {
+    barre = document.createElement('div');
+    barre.id = 'barre-probleme';
+    barre.addEventListener('click', () => barre.remove());
+    document.body.appendChild(barre);
+  }
+  barre.textContent = 'Problème technique : ' + message;
+}
+
+window.addEventListener('error', (e) => signalerProbleme(e.message || 'erreur inconnue'));
+window.addEventListener('unhandledrejection', (e) => {
+  signalerProbleme(e.reason && e.reason.message ? e.reason.message : String(e.reason));
+});
+
 const Stockage = {
   societes: [],
   taches: [],
