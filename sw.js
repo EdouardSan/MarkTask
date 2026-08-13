@@ -2,7 +2,7 @@
 // Met l'app en cache pour qu'elle s'ouvre et fonctionne sans connexion.
 // (Les données, elles, sont gérées par le cache hors-ligne de Firestore.)
 
-const CACHE = 'marktask-v3';
+const CACHE = 'marktask-v4';
 
 const FICHIERS = [
   './',
@@ -42,11 +42,12 @@ self.addEventListener('fetch', (e) => {
   if (url.hostname.endsWith('googleapis.com')) return;
 
   if (url.origin === self.location.origin || e.request.mode === 'navigate') {
-    // tout ce qui vient du site (pages, scripts, styles) : le réseau d'abord —
-    // les mises à jour s'appliquent dès le chargement suivant — et le cache
-    // en secours pour fonctionner hors-ligne
+    // tout ce qui vient du site (pages, scripts, styles) : le réseau d'abord,
+    // en forçant la revalidation ({cache:'no-cache'}) — sans elle, le cache
+    // HTTP du navigateur peut mélanger deux versions (HTML neuf, script vieux).
+    // Le cache du service worker reste le secours hors-ligne.
     e.respondWith(
-      fetch(e.request)
+      fetch(e.request, { cache: 'no-cache' })
         .then((reponse) => {
           const copie = reponse.clone();
           caches.open(CACHE).then((cache) => cache.put(e.request, copie));
