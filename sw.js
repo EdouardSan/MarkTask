@@ -2,7 +2,7 @@
 // Met l'app en cache pour qu'elle s'ouvre et fonctionne sans connexion.
 // (Les données, elles, sont gérées par le cache hors-ligne de Firestore.)
 
-const CACHE = 'marktask-v2';
+const CACHE = 'marktask-v3';
 
 const FICHIERS = [
   './',
@@ -41,9 +41,10 @@ self.addEventListener('fetch', (e) => {
   // ne jamais intercepter Firestore : le SDK gère lui-même temps réel et hors-ligne
   if (url.hostname.endsWith('googleapis.com')) return;
 
-  if (e.request.mode === 'navigate') {
-    // pages : le réseau d'abord (pour recevoir les mises à jour),
-    // le cache en secours (pour fonctionner hors-ligne)
+  if (url.origin === self.location.origin || e.request.mode === 'navigate') {
+    // tout ce qui vient du site (pages, scripts, styles) : le réseau d'abord —
+    // les mises à jour s'appliquent dès le chargement suivant — et le cache
+    // en secours pour fonctionner hors-ligne
     e.respondWith(
       fetch(e.request)
         .then((reponse) => {
@@ -58,18 +59,15 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // ressources : le cache d'abord (rapide, marche hors-ligne),
-  // rafraîchies en arrière-plan pour la prochaine visite
+  // bibliothèques externes (adresses versionnées, immuables) : cache d'abord
   e.respondWith(
-    caches.match(e.request).then((enCache) => {
-      const rafraichissement = fetch(e.request)
-        .then((reponse) => {
-          const copie = reponse.clone();
-          caches.open(CACHE).then((cache) => cache.put(e.request, copie));
-          return reponse;
-        })
-        .catch(() => enCache);
-      return enCache || rafraichissement;
-    })
+    caches.match(e.request).then((enCache) =>
+      enCache ||
+      fetch(e.request).then((reponse) => {
+        const copie = reponse.clone();
+        caches.open(CACHE).then((cache) => cache.put(e.request, copie));
+        return reponse;
+      })
+    )
   );
 });
