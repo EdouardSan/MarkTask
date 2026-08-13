@@ -7,7 +7,14 @@
 // par l'objet « firebaseConfig » copié depuis la console Firebase
 // (Paramètres du projet → Vos applications → Configuration).
 
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyCNUk7mdbTVN5LTnSd9CG-btrAHwHM735E',
+  authDomain: 'marktask-8680a.firebaseapp.com',
+  projectId: 'marktask-8680a',
+  storageBucket: 'marktask-8680a.firebasestorage.app',
+  messagingSenderId: '808946359433',
+  appId: '1:808946359433:web:d801006067a958392afa58',
+};
 
 // Identifiant secret de la liste dans la base (généré aléatoirement).
 // Il fait partie de l'adresse des données et des règles de sécurité : ne pas le changer.
