@@ -192,11 +192,16 @@ function celebrer() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const fete = $('#celebration');
   clearTimeout(celebrer.minuteur);
-  // redémarre l'animation même si elle tournait déjà
-  fete.hidden = true;
-  void fete.offsetWidth;
   fete.hidden = false;
-  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 1500);
+  // redémarrage fiable : retirer la classe d'animation, forcer un recalcul,
+  // la remettre — fonctionne aussi quand l'animation vient de se terminer
+  fete.classList.remove('celebration-active');
+  void fete.offsetWidth;
+  fete.classList.add('celebration-active');
+  celebrer.minuteur = setTimeout(() => {
+    fete.hidden = true;
+    fete.classList.remove('celebration-active');
+  }, 1600);
 }
 
 // ---- Fiche de survol -----------------------------------------------------

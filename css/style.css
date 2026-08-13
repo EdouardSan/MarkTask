@@ -801,6 +801,12 @@ body {
   place-items: center;
   background: rgba(4, 4, 8, 0.55);
   pointer-events: none;               /* ne bloque jamais l'utilisateur */
+  opacity: 0;                         /* visible uniquement pendant l'animation */
+}
+
+/* l'animation est portée par cette classe : le code la retire puis la remet,
+   seul redémarrage fiable sur tous les navigateurs (Safari compris) */
+.celebration.celebration-active {
   animation: celebration-vie 1.4s ease forwards;
 }
 
@@ -814,6 +820,9 @@ body {
 .coche {
   width: min(230px, 45vw);
   filter: drop-shadow(0 0 45px rgba(175, 207, 254, 0.55));
+}
+
+.celebration-active .coche {
   animation: coche-pop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
@@ -826,6 +835,9 @@ body {
 .coche-trait {
   stroke-dasharray: 130;
   stroke-dashoffset: 130;
+}
+
+.celebration-active .coche-trait {
   animation: coche-trace 0.45s ease-out 0.1s forwards;
 }
 
