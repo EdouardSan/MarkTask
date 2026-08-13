@@ -188,6 +188,14 @@ body {
   outline-offset: 3px;
 }
 
+/* ---- Barres de défilement discrètes ------------------------------------ */
+
+.liste-taches,
+.liste-societes {
+  scrollbar-width: thin;
+  scrollbar-color: #2A2E34 transparent;
+}
+
 /* ---- Sociétés ---------------------------------------------------------- */
 
 .liste-societes {
