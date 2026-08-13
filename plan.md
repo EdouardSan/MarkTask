@@ -24,21 +24,23 @@ Décision proposée : **l'urgence est calculée automatiquement à partir de la 
 L'**importance**, elle, est choisie à la création (curseur simple). Si tu préfères une
 urgence choisie à la main, on le dit avant le bloc 4 et ça ne change rien au reste.
 
-## Agencement desktop (à confirmer avec ton schéma à la main)
+## Agencement desktop (d'après le schéma à la main : `design/schema-dashboard-main.jpeg`)
 
 ```
-┌────────────────────────────────────────────────────────┐
-│  Logo MarkTask                     [ + Nouvelle tâche ] │
-├─────────────────────────────────────────┬──────────────┤
-│                                         │              │
-│   GRAPHIQUE  importance ↑ / urgence →   │   SOCIÉTÉS   │
-│   (pins colorés par société,            │   ● Alpha    │
-│    survol = fiche de la tâche)          │   ● Beta     │
-│                                         │   [+ Ajouter]│
-├─────────────────────────────────────────┴──────────────┤
-│   TÂCHES À RÉALISER (surbrillance au survol d'un pin)  │
-│   ▸ Tâches réalisées (repliées)                        │
-└────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                        MARKTASK                          │
+├──────────────────────────────┬───────────┬───────────────┤
+│                              │           │  SOCIÉTÉS     │
+│  GRAPHIQUE                   │ [Nouvelle │  ● Société 1  │
+│  importance ↑ / urgence →    │  tâche]   │  ● Société 2  │
+│  (pins colorés par société,  │           │               │
+│   survol = fiche de la tâche)│           │  [+ Nouvelle  │
+│                              │           │    société]   │
+├──────────────────────────────┴─┬─────────┴───────────────┤
+│  TÂCHES À RÉALISER             │  TÂCHES RÉALISÉES       │
+│  (surbrillance au survol       │                         │
+│   d'un pin du graphique)       │                         │
+└────────────────────────────────┴─────────────────────────┘
 ```
 
 Mobile (défilement vertical) : logo → bouton Nouvelle tâche → graphique → sociétés → tâches à réaliser → tâches réalisées.
