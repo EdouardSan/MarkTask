@@ -32,8 +32,18 @@
         <button class="btn-principal" type="button">+ Nouvelle tâche</button>
         <div class="graphique">
           <span class="axe-label axe-y">Importance</span>
-          <div class="graphique-zone">
-            <!-- Bloc 4 : les pins des tâches viendront ici -->
+          <div class="graphique-zone" id="graphique-zone">
+            <!-- les pins des tâches sont ajoutés ici par js/app.js -->
+            <div class="fiche" id="fiche" hidden>
+              <span class="fiche-nom" id="fiche-nom"></span>
+              <span class="fiche-ligne">
+                <span class="pastille" id="fiche-pastille"></span>
+                <span id="fiche-societe"></span>
+              </span>
+              <p class="fiche-desc" id="fiche-desc"></p>
+              <span class="fiche-ligne" id="fiche-deadline"></span>
+              <span class="fiche-ligne" id="fiche-urgence"></span>
+            </div>
           </div>
           <span class="axe-label axe-x">Urgence</span>
         </div>
@@ -48,28 +58,11 @@
         <div class="societes-contenu">
         <h2 class="carte-titre">Sociétés</h2>
         <div class="societes-filtres">
-          <button class="btn-filtre" type="button">Tout cocher</button>
-          <button class="btn-filtre" type="button">Tout décocher</button>
+          <button class="btn-filtre" type="button" id="btn-tout-cocher">Tout cocher</button>
+          <button class="btn-filtre" type="button" id="btn-tout-decocher">Tout décocher</button>
         </div>
-        <ul class="liste-societes">
-          <li class="societe">
-            <label class="societe-label">
-              <input class="societe-case" type="checkbox" checked>
-              <span class="pastille" style="--couleur:#4FA3E8"></span>Alpha Conseil
-            </label>
-          </li>
-          <li class="societe">
-            <label class="societe-label">
-              <input class="societe-case" type="checkbox" checked>
-              <span class="pastille" style="--couleur:#E8A14F"></span>Bâtir &amp; Co
-            </label>
-          </li>
-          <li class="societe">
-            <label class="societe-label">
-              <input class="societe-case" type="checkbox" checked>
-              <span class="pastille" style="--couleur:#C07CE8"></span>Novatech
-            </label>
-          </li>
+        <ul class="liste-societes" id="liste-societes">
+          <!-- rempli par js/app.js -->
         </ul>
         <button class="btn-secondaire" type="button">+ Nouvelle société</button>
         </div>
@@ -84,31 +77,8 @@
         <summary class="carte-titre-repliable">
           <span class="chevron" aria-hidden="true"></span>Tâches à réaliser
         </summary>
-        <ul class="liste-taches">
-          <li class="tache" style="--couleur:#4FA3E8">
-            <span class="tache-nom">Relancer le client sur le devis</span>
-            <span class="tache-meta">Alpha Conseil · échéance 15 août</span>
-          </li>
-          <li class="tache" style="--couleur:#E8A14F">
-            <span class="tache-nom">Envoyer les factures de juillet</span>
-            <span class="tache-meta">Bâtir &amp; Co · échéance 18 août</span>
-          </li>
-          <li class="tache" style="--couleur:#C07CE8">
-            <span class="tache-nom">Préparer la réunion trimestrielle</span>
-            <span class="tache-meta">Novatech · échéance 22 août</span>
-          </li>
-          <li class="tache" style="--couleur:#4FA3E8">
-            <span class="tache-nom">Mettre à jour le contrat de maintenance</span>
-            <span class="tache-meta">Alpha Conseil · échéance 29 août</span>
-          </li>
-          <li class="tache" style="--couleur:#C07CE8">
-            <span class="tache-nom">Valider la maquette du site</span>
-            <span class="tache-meta">Novatech · échéance 5 septembre</span>
-          </li>
-          <li class="tache" style="--couleur:#E8A14F">
-            <span class="tache-nom">Commander les fournitures de chantier</span>
-            <span class="tache-meta">Bâtir &amp; Co · échéance 12 septembre</span>
-          </li>
+        <ul class="liste-taches" id="liste-taches">
+          <!-- rempli par js/app.js -->
         </ul>
       </details>
 
