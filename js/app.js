@@ -167,6 +167,9 @@ function afficherTaches() {
 function afficherPins() {
   const zone = $('#graphique-zone');
   const cochees = societesCochees();
+  // les pins vont être redessinés : la fiche ne doit pas rester orpheline
+  ficheEpinglee = null;
+  cacherFiche();
   zone.querySelectorAll('.pin').forEach((pin) => pin.remove());
   for (const tache of TACHES) {
     if (tache.faite || !cochees.has(tache.societe)) continue;
@@ -294,6 +297,20 @@ function brancherEvenements() {
     const pin = e.target.closest('.pin');
     if (pin) montrerFiche(pin);
   });
+  zone.addEventListener('focusout', (e) => {
+    if (e.target.closest('.pin') && !ficheEpinglee) cacherFiche();
+  });
+
+  // une fenêtre qui se ferme peut rendre le focus à un pin : pas de fiche fantôme
+  for (const dialogue of ['#dialogue-tache', '#dialogue-terminer']) {
+    $(dialogue).addEventListener('close', () => {
+      if (document.activeElement && document.activeElement.classList.contains('pin')) {
+        document.activeElement.blur();
+      }
+      ficheEpinglee = null;
+      cacherFiche();
+    });
+  }
 
   zone.addEventListener('click', (e) => {
     // mode placement (desktop) : le clic fixe l'importance de la nouvelle tâche

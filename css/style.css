@@ -773,6 +773,10 @@ body {
 
 /* ---- Célébration : grande coche verte ----------------------------------- */
 
+/* indispensable : display:grid ci-dessous écraserait l'attribut hidden,
+   et l'animation se jouerait au chargement de la page au lieu d'attendre */
+.celebration[hidden] { display: none; }
+
 .celebration {
   position: fixed;
   inset: 0;
@@ -793,7 +797,7 @@ body {
 
 .coche {
   width: min(230px, 45vw);
-  filter: drop-shadow(0 0 45px rgba(124, 203, 83, 0.55));
+  filter: drop-shadow(0 0 45px rgba(175, 207, 254, 0.55));
   animation: coche-pop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
