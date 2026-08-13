@@ -33,10 +33,13 @@ function hslVersHex(h, s, l) {
 const AUJOURDHUI = new Date();
 AUJOURDHUI.setHours(0, 0, 0, 0);
 
-// La deadline est stockée en texte « AAAA-MM-JJ » (le format du champ date)
+// La deadline est stockée en texte « AAAA-MM-JJ » (le format du champ date).
+// Une valeur inattendue ne doit jamais faire disparaître la tâche du graphique :
+// on la traite alors comme « échéance aujourd'hui » (pin tout à droite, bien visible).
 function dateDeadline(tache) {
-  const [annee, mois, jour] = tache.deadline.split('-').map(Number);
-  return new Date(annee, mois - 1, jour);
+  const [annee, mois, jour] = String(tache.deadline || '').split('-').map(Number);
+  const date = new Date(annee, (mois || 1) - 1, jour || 1);
+  return Number.isFinite(date.getTime()) ? date : new Date(AUJOURDHUI);
 }
 
 // ---- Urgence : calculée depuis la deadline (voir plan.md) ---------------
@@ -379,12 +382,11 @@ function brancherEvenements() {
   $('#societe-annuler').addEventListener('click', () => $('#dialogue-societe').close());
   $('#formulaire-societe').addEventListener('submit', validerNouvelleSociete);
 
-  // ajout d'une tâche : sur desktop, on vise d'abord le graphe ;
-  // sur mobile, le formulaire s'ouvre directement (curseur d'importance)
+  // ajout d'une tâche : on vise d'abord le graphe (ordinateur comme téléphone),
+  // le clic/appui sur le graphe fixe l'importance
   $('#btn-nouvelle-tache').addEventListener('click', () => {
     if (modePlacement) { quitterPlacement(); return; }
-    if (MOBILE.matches) ouvrirDialogueTache(null);
-    else entrerPlacement();
+    entrerPlacement();
   });
   $('#tache-annuler').addEventListener('click', () => $('#dialogue-tache').close());
   $('#formulaire-tache').addEventListener('submit', validerTache);

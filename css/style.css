@@ -887,6 +887,16 @@ body {
     height: 20px;
   }
 
+  /* la bulle d'aide du mode visée passe sous le bouton, en pleine largeur */
+  .placement-aide {
+    top: 60px;
+    left: 12px;
+    right: 12px;
+    translate: 0 0;
+    max-width: none;
+    border-radius: 12px;
+  }
+
   /* boutons Restaurer/Supprimer sous le texte plutôt que sur le côté */
   .tache:has(.tache-actions) { padding-right: 12px; }
 
