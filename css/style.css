@@ -801,20 +801,7 @@ body {
   place-items: center;
   background: rgba(4, 4, 8, 0.55);
   pointer-events: none;               /* ne bloque jamais l'utilisateur */
-  opacity: 0;                         /* visible uniquement pendant l'animation */
-}
-
-/* l'animation est portée par cette classe : le code la retire puis la remet,
-   seul redémarrage fiable sur tous les navigateurs (Safari compris) */
-.celebration.celebration-active {
-  animation: celebration-vie 1.4s ease forwards;
-}
-
-@keyframes celebration-vie {
-  0%   { opacity: 0; }
-  12%  { opacity: 1; }
-  78%  { opacity: 1; }
-  100% { opacity: 0; }
+  opacity: 0;                         /* rendue visible par l'animation (app.js) */
 }
 
 .coche {
@@ -822,27 +809,10 @@ body {
   filter: drop-shadow(0 0 45px rgba(175, 207, 254, 0.55));
 }
 
-.celebration-active .coche {
-  animation: coche-pop 0.4s cubic-bezier(0.2, 1.6, 0.4, 1) both;
-}
-
-@keyframes coche-pop {
-  from { scale: 0.45; }
-  to   { scale: 1; }
-}
-
-/* la coche se dessine d'un trait */
+/* le tracé est dessiné par l'animation pilotée dans app.js ;
+   sans animation, la coche reste simplement affichée en entier */
 .coche-trait {
   stroke-dasharray: 130;
-  stroke-dashoffset: 130;
-}
-
-.celebration-active .coche-trait {
-  animation: coche-trace 0.45s ease-out 0.1s forwards;
-}
-
-@keyframes coche-trace {
-  to { stroke-dashoffset: 0; }
 }
 
 .dialogue-question {

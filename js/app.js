@@ -191,17 +191,30 @@ function terminerTache(tache) {
 function celebrer() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const fete = $('#celebration');
+  const coche = fete.querySelector('.coche');
+  const trait = fete.querySelector('.coche-trait');
   clearTimeout(celebrer.minuteur);
   fete.hidden = false;
-  // redémarrage fiable : retirer la classe d'animation, forcer un recalcul,
-  // la remettre — fonctionne aussi quand l'animation vient de se terminer
-  fete.classList.remove('celebration-active');
-  void fete.offsetWidth;
-  fete.classList.add('celebration-active');
-  celebrer.minuteur = setTimeout(() => {
-    fete.hidden = true;
-    fete.classList.remove('celebration-active');
-  }, 1600);
+
+  // animations pilotées par le code (Web Animations API) : chaque appel crée
+  // des animations neuves — redémarrage garanti, sur Safari comme ailleurs
+  for (const el of [fete, coche, trait]) {
+    el.getAnimations().forEach((a) => a.cancel());
+  }
+  fete.animate(
+    [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.78 }, { opacity: 0 }],
+    { duration: 1400, easing: 'ease', fill: 'forwards' }
+  );
+  coche.animate(
+    [{ transform: 'scale(0.45)' }, { transform: 'scale(1)' }],
+    { duration: 400, easing: 'cubic-bezier(0.2, 1.6, 0.4, 1)', fill: 'both' }
+  );
+  trait.animate(
+    [{ strokeDashoffset: 130 }, { strokeDashoffset: 0 }],
+    { duration: 450, delay: 100, easing: 'ease-out', fill: 'backwards' }
+  );
+
+  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 1500);
 }
 
 // ---- Fiche de survol -----------------------------------------------------
