@@ -20,7 +20,7 @@
       </summary>
       <nav class="menu-panneau">
         <a class="menu-lien" href="taches-realisees.html">Tâches réalisées</a>
-        <span class="menu-version">version 32</span>
+        <span class="menu-version">version 33</span>
       </nav>
     </details>
     <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
@@ -42,6 +42,13 @@
           <div class="graphique-zone" id="graphique-zone">
             <!-- les pins des tâches sont ajoutés ici par js/app.js -->
             <div class="fiche" id="fiche" hidden>
+              <button class="fiche-modifier" id="fiche-modifier" type="button" aria-label="Modifier la tâche">
+                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                        fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
               <span class="fiche-nom" id="fiche-nom"></span>
               <span class="fiche-ligne">
                 <span class="pastille" id="fiche-pastille"></span>
@@ -149,7 +156,7 @@
 
   <dialog class="dialogue" id="dialogue-societe">
     <form id="formulaire-societe" novalidate>
-      <h2 class="dialogue-titre">Nouvelle société</h2>
+      <h2 class="dialogue-titre" id="societe-dialogue-titre">Nouvelle société</h2>
       <label class="champ">
         Nom de la société
         <input type="text" id="societe-nom" maxlength="40" autocomplete="off">
@@ -161,9 +168,20 @@
       <p class="dialogue-erreur" id="societe-erreur" hidden></p>
       <div class="dialogue-actions">
         <button class="btn-filtre" type="button" id="societe-annuler">Annuler</button>
-        <button class="btn-principal" type="submit">Ajouter</button>
+        <button class="btn-principal" type="submit" id="societe-valider">Ajouter</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Volet Modifier / Supprimer (mobile : appui long sur une société ou une
+       tâche de la liste, ou crayon en bout de ligne) -->
+  <dialog class="dialogue" id="dialogue-choix">
+    <button class="dialogue-fermer" type="button" id="choix-fermer" aria-label="Fermer">&times;</button>
+    <h2 class="dialogue-titre" id="choix-titre"></h2>
+    <div class="dialogue-actions">
+      <button class="btn-danger" type="button" id="choix-supprimer">Supprimer</button>
+      <button class="btn-principal" type="button" id="choix-modifier">Modifier</button>
+    </div>
   </dialog>
 
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>

@@ -98,6 +98,7 @@ function afficherSocietes() {
   for (const societe of SOCIETES) {
     const li = document.createElement('li');
     li.className = 'societe';
+    li.dataset.id = societe.id;
     li.innerHTML = `
       <label class="societe-label">
         <input class="societe-case" type="checkbox" data-societe="${societe.id}">
@@ -150,6 +151,13 @@ function afficherTaches() {
           <span class="tache-detail-ligne tache-detail-urgence"></span>
         </div>
       </details>
+      <button class="tache-modifier" type="button" aria-label="Modifier ou supprimer la tâche">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
       <input class="tache-case" type="checkbox" title="Marquer comme réalisée">`;
     li.querySelector('.tache-nom').textContent = tache.nom;
     li.querySelector('.tache-detail-societe').textContent = societe ? societe.nom : '?';
@@ -342,6 +350,14 @@ function cacherFiche() {
   surligner(null, false);
 }
 
+function modifierDepuisFiche() {
+  const tache = TACHES.find((t) => t.id === ficheTacheId);
+  if (!tache) return;
+  ficheEpinglee = null;
+  cacherFiche();
+  ouvrirDialogueTache(tache);
+}
+
 function proposerTerminerDepuisFiche() {
   const tache = TACHES.find((t) => t.id === ficheTacheId);
   if (!tache) return;
@@ -479,6 +495,13 @@ function brancherEvenements() {
     proposerTerminerDepuisFiche();
   });
 
+  // crayon de la fiche (mobile) : ouvre la modification de la tâche
+  $('#fiche-modifier').addEventListener('click', modifierDepuisFiche);
+  $('#fiche-modifier').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    modifierDepuisFiche();
+  });
+
   // cocher une tâche : elle part dans « Tâches réalisées »
   $('#liste-taches').addEventListener('change', (e) => {
     const li = e.target.closest('.tache');
@@ -487,15 +510,38 @@ function brancherEvenements() {
     if (tache) terminerTache(tache);
   });
 
+  // crayon en bout de ligne (mobile) : volet Modifier / Supprimer
+  $('#liste-taches').addEventListener('click', (e) => {
+    const bouton = e.target.closest('.tache-modifier');
+    if (!bouton) return;
+    const tache = TACHES.find((t) => t.id === bouton.closest('.tache').dataset.id);
+    if (tache) ouvrirChoixTache(tache);
+  });
+
+  // appui long (mobile) sur une société ou une tâche : volet Modifier / Supprimer
+  brancherAppuiLong($('#liste-societes'), '.societe', (li) => {
+    const societe = SOCIETES.find((s) => s.id === li.dataset.id);
+    if (societe) ouvrirChoixSociete(societe);
+  });
+  brancherAppuiLong($('#liste-taches'), '.tache', (li) => {
+    const tache = TACHES.find((t) => t.id === li.dataset.id);
+    if (tache) ouvrirChoixTache(tache);
+  });
+
+  // les boutons du volet Modifier / Supprimer
+  $('#choix-fermer').addEventListener('click', () => $('#dialogue-choix').close());
+  $('#choix-modifier').addEventListener('click', () => executerChoix('modifier'));
+  $('#choix-supprimer').addEventListener('click', () => executerChoix('supprimer'));
+
   // filtre par société
   $('#liste-societes').addEventListener('change', afficherPins);
   $('#btn-tout-cocher').addEventListener('click', () => cocherTout(true));
   $('#btn-tout-decocher').addEventListener('click', () => cocherTout(false));
 
-  // ajout d'une société
-  $('#btn-nouvelle-societe').addEventListener('click', ouvrirDialogueSociete);
+  // ajout d'une société (l'appui long sur sa ligne ouvre la modification)
+  $('#btn-nouvelle-societe').addEventListener('click', () => ouvrirDialogueSociete(null));
   $('#societe-annuler').addEventListener('click', () => $('#dialogue-societe').close());
-  $('#formulaire-societe').addEventListener('submit', validerNouvelleSociete);
+  $('#formulaire-societe').addEventListener('submit', validerSociete);
 
   // ajout d'une tâche : on vise d'abord le graphe (ordinateur comme téléphone),
   // le clic/appui sur le graphe fixe l'importance
@@ -558,7 +604,7 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
   if (tache) select.value = tache.societe;
   $('#tache-importance').value = importance;
   $('#tache-importance-valeur').textContent = importance;
-  $('#dialogue-tache').showModal();
+  if (!$('#dialogue-tache').open) $('#dialogue-tache').showModal();
 
   if (!SOCIETES.length) {
     erreur.textContent = 'Crée d\'abord une société (bouton « + Nouvelle société » du dashboard).';
@@ -612,16 +658,105 @@ function supprimerTacheEnEdition() {
   $('#dialogue-tache').close();
 }
 
-// ---- Ajout d'une société -------------------------------------------------
+// ---- Volet Modifier / Supprimer (mobile : appui long ou crayon) ----------
 
-function ouvrirDialogueSociete() {
-  $('#societe-nom').value = '';
-  $('#societe-couleur').value = couleurProposee();
+let choixActions = null;   // actions { modifier, supprimer } du volet ouvert
+
+function ouvrirChoix(titre, actions) {
+  choixActions = actions;
+  $('#choix-titre').textContent = titre;
+  $('#dialogue-choix').showModal();
+}
+
+function executerChoix(nom) {
+  const action = choixActions && choixActions[nom];
+  choixActions = null;
+  $('#dialogue-choix').close();
+  if (action) action();
+}
+
+function ouvrirChoixTache(tache) {
+  ouvrirChoix(`Tâche « ${tache.nom} »`, {
+    modifier: () => ouvrirDialogueTache(tache),
+    supprimer: () => {
+      if (confirm(`Supprimer définitivement la tâche « ${tache.nom} » ?`)) {
+        Stockage.supprimerTache(tache.id);
+      }
+    },
+  });
+}
+
+function ouvrirChoixSociete(societe) {
+  ouvrirChoix(`Société « ${societe.nom} »`, {
+    modifier: () => ouvrirDialogueSociete(societe),
+    supprimer: () => supprimerSociete(societe),
+  });
+}
+
+// Détection de l'appui long (une demi-seconde) sur une ligne d'une liste.
+// Mobile uniquement ; un appui long consommé ne doit pas aussi agir comme un
+// clic (cocher une case, déplier une tâche…).
+function brancherAppuiLong(liste, selecteur, action) {
+  let minuteur = null;
+  let depart = null;
+  let consomme = false;
+
+  liste.addEventListener('pointerdown', (e) => {
+    if (!MOBILE.matches) return;
+    const element = e.target.closest(selecteur);
+    if (!element) return;
+    depart = { x: e.clientX, y: e.clientY };
+    clearTimeout(minuteur);
+    minuteur = setTimeout(() => {
+      minuteur = null;
+      consomme = true;
+      action(element);
+    }, 500);
+  });
+
+  const abandonner = () => {
+    clearTimeout(minuteur);
+    minuteur = null;
+    // le clic à étouffer suit immédiatement le relâchement ; s'il ne vient
+    // jamais, le fusible se désarme tout seul juste après
+    if (consomme) setTimeout(() => { consomme = false; }, 400);
+  };
+  liste.addEventListener('pointerup', abandonner);
+  liste.addEventListener('pointercancel', abandonner);   // ex. la liste défile
+  liste.addEventListener('pointermove', (e) => {
+    if (minuteur && depart &&
+        Math.hypot(e.clientX - depart.x, e.clientY - depart.y) > 12) abandonner();
+  });
+
+  // pas de menu contextuel natif par-dessus notre volet
+  liste.addEventListener('contextmenu', (e) => {
+    if (MOBILE.matches) e.preventDefault();
+  });
+
+  liste.addEventListener('click', (e) => {
+    if (!consomme) return;
+    consomme = false;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+}
+
+// ---- Ajout, modification et suppression d'une société --------------------
+
+let societeEnEdition = null;   // id de la société en cours de modification
+
+// societe = null → création ; societe fournie → modification
+function ouvrirDialogueSociete(societe) {
+  societeEnEdition = societe ? societe.id : null;
+  $('#societe-dialogue-titre').textContent = societe ? 'Modifier la société' : 'Nouvelle société';
+  $('#societe-valider').textContent = societe ? 'Enregistrer' : 'Ajouter';
+  $('#societe-nom').value = societe ? societe.nom : '';
+  $('#societe-couleur').value = societe ? societe.couleur : couleurProposee();
   $('#societe-erreur').hidden = true;
   $('#dialogue-societe').showModal();
 }
 
-function validerNouvelleSociete(e) {
+function validerSociete(e) {
   e.preventDefault();
   const nom = $('#societe-nom').value.trim();
   const erreur = $('#societe-erreur');
@@ -631,18 +766,34 @@ function validerNouvelleSociete(e) {
     erreur.hidden = false;
     return;
   }
-  if (SOCIETES.some((s) => s.nom.toLowerCase() === nom.toLowerCase())) {
+  if (SOCIETES.some((s) => s.id !== societeEnEdition && s.nom.toLowerCase() === nom.toLowerCase())) {
     erreur.textContent = 'Cette société existe déjà dans la liste.';
     erreur.hidden = false;
     return;
   }
 
-  Stockage.creerSociete({
-    id: crypto.randomUUID(),
-    nom,
-    couleur: $('#societe-couleur').value,
-  });
+  const couleur = $('#societe-couleur').value;
+  if (societeEnEdition) {
+    const societe = SOCIETES.find((s) => s.id === societeEnEdition);
+    Stockage.majSociete({ ...societe, nom, couleur });
+  } else {
+    Stockage.creerSociete({ id: crypto.randomUUID(), nom, couleur });
+  }
+  societeEnEdition = null;
   $('#dialogue-societe').close();
+}
+
+// La suppression emporte aussi les tâches de la société (à faire et réalisées) :
+// une tâche sans société ne pourrait plus s'afficher nulle part.
+function supprimerSociete(societe) {
+  const liees = TACHES.filter((t) => t.societe === societe.id);
+  const question =
+    !liees.length      ? `Supprimer la société « ${societe.nom} » ?` :
+    liees.length === 1 ? `Supprimer la société « ${societe.nom} » et sa tâche ?` :
+    `Supprimer la société « ${societe.nom} » et ses ${liees.length} tâches ?`;
+  if (!confirm(question)) return;
+  for (const tache of liees) Stockage.supprimerTache(tache.id);
+  Stockage.supprimerSociete(societe.id);
 }
 
 function cocherTout(etat) {

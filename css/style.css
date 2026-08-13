@@ -742,6 +742,34 @@ body {
   cursor: pointer;
 }
 
+/* crayons Modifier : mobile uniquement (desktop = clic sur le pin) */
+.fiche-modifier,
+.tache-modifier {
+  display: none;
+  position: absolute;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--carte-bord);
+  border-radius: 8px;
+  background: none;
+  color: var(--texte-2nd);
+  cursor: pointer;
+}
+
+.fiche-modifier {
+  top: 8px;
+  right: 8px;
+}
+
+/* en bout de ligne d'une tâche, à gauche de la case « réalisée » */
+.tache-modifier {
+  top: 50%;
+  right: 44px;
+  translate: 0 -50%;
+}
+
 /* ---- Surbrillance de la tâche correspondante dans la liste -------------- */
 
 .tache-surbrillance {
@@ -999,5 +1027,22 @@ body {
   .tache-case {
     width: 22px;
     height: 22px;
+  }
+
+  /* crayons Modifier visibles (fiche du graphique et lignes de tâches) */
+  .fiche-modifier,
+  .tache-modifier { display: grid; }
+
+  .fiche-nom { padding-right: 38px; }        /* le nom ne passe pas sous le crayon */
+
+  .tache:has(.tache-case) { padding-right: 90px; }
+
+  /* l'appui long ouvre le volet Modifier / Supprimer :
+     pas de sélection de texte ni de menu natif par-dessus */
+  .societe-label,
+  .tache {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
   }
 }

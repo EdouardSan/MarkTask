@@ -91,6 +91,26 @@ const Stockage = {
     }
   },
 
+  majSociete(societe) {
+    if (this.mode === 'nuage') {
+      const { id, ...champs } = societe;
+      this._racine.collection('societes').doc(id).set(champs);
+    } else {
+      const index = this.societes.findIndex((s) => s.id === societe.id);
+      if (index !== -1) this.societes[index] = societe;
+      this._sauverLocal(CLE_SOCIETES, this.societes);
+    }
+  },
+
+  supprimerSociete(id) {
+    if (this.mode === 'nuage') {
+      this._racine.collection('societes').doc(id).delete();
+    } else {
+      this.societes = this.societes.filter((s) => s.id !== id);
+      this._sauverLocal(CLE_SOCIETES, this.societes);
+    }
+  },
+
   // ---- Tâches ----
 
   creerTache(tache) {
