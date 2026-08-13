@@ -324,7 +324,10 @@ function surligner(id, actif) {
   document.querySelectorAll('#liste-taches .tache').forEach((li) => {
     const surbrillance = actif && li.dataset.id === id;
     li.classList.toggle('tache-surbrillance', surbrillance);
-    if (surbrillance) li.scrollIntoView({ block: 'nearest' });
+    // desktop : amener la ligne en vue DANS la liste (qui défile en interne).
+    // mobile : surtout pas — la liste vit dans la page, ce défilement
+    // emporterait tout l'écran vers le bas.
+    if (surbrillance && !MOBILE.matches) li.scrollIntoView({ block: 'nearest' });
   });
 }
 
