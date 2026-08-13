@@ -89,54 +89,24 @@
 
   </main>
 
-  <!-- Célébration quand une tâche est terminée -->
+  <!-- Célébration quand une tâche est terminée : grande coche verte -->
   <div class="celebration" id="celebration" hidden aria-hidden="true">
-    <div class="boule boule-gauche"></div>
-    <div class="boule boule-droite"></div>
-    <p class="celebration-texte">Tâche terminée&nbsp;!</p>
-
-    <svg class="danseur" viewBox="0 0 200 240" role="img" aria-label="Danseur">
-      <!-- tresses -->
-      <g class="tresse tresse-gauche">
-        <path d="M78 52 Q68 78 72 106" stroke="#1A1208" stroke-width="9" fill="none" stroke-linecap="round"/>
-      </g>
-      <g class="tresse tresse-droite">
-        <path d="M122 52 Q132 78 128 106" stroke="#1A1208" stroke-width="9" fill="none" stroke-linecap="round"/>
-      </g>
-      <!-- tête -->
-      <circle cx="100" cy="50" r="26" fill="#8D5A2B"/>
-      <path d="M74 44 Q100 24 126 44 L126 36 Q100 16 74 36 Z" fill="#1A1208"/>
-      <!-- lunettes -->
-      <rect x="78" y="42" width="19" height="11" rx="4" fill="#0B0B0E"/>
-      <rect x="103" y="42" width="19" height="11" rx="4" fill="#0B0B0E"/>
-      <rect x="95" y="45" width="10" height="3" fill="#0B0B0E"/>
-      <!-- sourire -->
-      <path d="M90 64 Q100 71 110 64" stroke="#3A2413" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <!-- torse -->
-      <rect x="72" y="78" width="56" height="66" rx="16" fill="#5A3FA0"/>
-      <!-- chaîne -->
-      <path d="M84 84 Q100 104 116 84" stroke="#E8C24F" stroke-width="4" fill="none"/>
-      <circle cx="100" cy="103" r="6" fill="#E8C24F"/>
-      <!-- bras -->
-      <g class="bras bras-gauche">
-        <path d="M76 88 Q52 96 44 70" stroke="#5A3FA0" stroke-width="13" fill="none" stroke-linecap="round"/>
-        <circle cx="43" cy="66" r="8" fill="#8D5A2B"/>
-      </g>
-      <g class="bras bras-droit">
-        <path d="M124 88 Q148 96 156 70" stroke="#5A3FA0" stroke-width="13" fill="none" stroke-linecap="round"/>
-        <circle cx="157" cy="66" r="8" fill="#8D5A2B"/>
-      </g>
-      <!-- jambes -->
-      <g class="jambe jambe-gauche">
-        <path d="M86 144 L82 196" stroke="#23262E" stroke-width="14" stroke-linecap="round"/>
-        <rect x="68" y="196" width="30" height="12" rx="6" fill="#FAF9FA"/>
-      </g>
-      <g class="jambe jambe-droite">
-        <path d="M114 144 L118 196" stroke="#23262E" stroke-width="14" stroke-linecap="round"/>
-        <rect x="102" y="196" width="30" height="12" rx="6" fill="#FAF9FA"/>
-      </g>
+    <svg class="coche" viewBox="0 0 120 120" role="img" aria-label="Tâche terminée">
+      <path class="coche-trait" d="M24 63 L51 89 L96 33"
+            fill="none" stroke="#7CCB53" stroke-width="13"
+            stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
+
+  <!-- Confirmation de fin de tâche (double-clic sur un pin) -->
+  <dialog class="dialogue" id="dialogue-terminer">
+    <h2 class="dialogue-titre">Terminer la tâche</h2>
+    <p class="dialogue-question" id="terminer-question"></p>
+    <div class="dialogue-actions">
+      <button class="btn-filtre" type="button" id="terminer-annuler">Annuler</button>
+      <button class="btn-principal" type="button" id="terminer-confirmer">Terminer</button>
+    </div>
+  </dialog>
 
   <dialog class="dialogue" id="dialogue-tache">
     <form id="formulaire-tache" novalidate>

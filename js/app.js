@@ -192,6 +192,7 @@ let ficheEpinglee = null;       // pin « épinglé » par un appui (mobile)
 let modePlacement = false;      // desktop : en attente d'un clic sur le graphe
 let tacheEnEdition = null;      // id de la tâche en cours de modification
 let clicSimpleEnAttente = null; // délai du simple clic, annulé par le double-clic
+let tacheATerminer = null;      // id de la tâche visée par la confirmation de fin
 
 // ---- Terminer une tâche (et fêter ça) ------------------------------------
 
@@ -212,7 +213,7 @@ function celebrer() {
   fete.hidden = true;
   void fete.offsetWidth;
   fete.hidden = false;
-  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 3000);
+  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 1500);
 }
 
 // ---- Fiche de survol -----------------------------------------------------
@@ -330,7 +331,7 @@ function brancherEvenements() {
     }
   });
 
-  // double-clic sur un pin (desktop) : terminer la tâche
+  // double-clic sur un pin (desktop) : proposer de terminer la tâche
   zone.addEventListener('dblclick', (e) => {
     if (MOBILE.matches || modePlacement) return;
     const pin = e.target.closest('.pin');
@@ -338,10 +339,19 @@ function brancherEvenements() {
     clearTimeout(clicSimpleEnAttente);
     const tache = TACHES.find((t) => t.id === pin.dataset.id);
     if (!tache) return;
-    if (confirm(`Terminer la tâche « ${tache.nom} » ?`)) {
-      cacherFiche();
-      terminerTache(tache);
-    }
+    cacherFiche();
+    tacheATerminer = tache.id;
+    $('#terminer-question').textContent = `Terminer la tâche « ${tache.nom} » ?`;
+    $('#dialogue-terminer').showModal();
+  });
+
+  // la fenêtre de confirmation de fin de tâche
+  $('#terminer-annuler').addEventListener('click', () => $('#dialogue-terminer').close());
+  $('#terminer-confirmer').addEventListener('click', () => {
+    const tache = TACHES.find((t) => t.id === tacheATerminer);
+    tacheATerminer = null;
+    $('#dialogue-terminer').close();
+    if (tache) terminerTache(tache);
   });
 
   // Échap annule le mode placement
