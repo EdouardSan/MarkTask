@@ -1,34 +1,33 @@
 // MarkTask — logique de l'application
-// Bloc 4 : graphique interactif. Bloc 5 : sociétés réelles, sauvegardées
-// dans le navigateur (localStorage, remplacé par Firebase au bloc 8).
-// Les tâches restent factices jusqu'au bloc 6.
+// Toutes les données (sociétés et tâches) sont créées par l'utilisateur et
+// sauvegardées dans le navigateur (localStorage, remplacé par Firebase au bloc 8).
 
-// ---- Sociétés : chargées depuis le navigateur ---------------------------
+// ---- Stockage navigateur -------------------------------------------------
 
 const CLE_SOCIETES = 'marktask.societes.v1';
+const CLE_TACHES = 'marktask.taches.v1';
 
-const SOCIETES_DEFAUT = [
-  { id: 'alpha',    nom: 'Alpha Conseil', couleur: '#4FA3E8' },
-  { id: 'batir',    nom: 'Bâtir & Co',    couleur: '#E8A14F' },
-  { id: 'novatech', nom: 'Novatech',      couleur: '#C07CE8' },
-];
-
-function chargerSocietes() {
+function chargerListe(cle) {
   try {
-    const brut = localStorage.getItem(CLE_SOCIETES);
+    const brut = localStorage.getItem(cle);
     if (brut) {
       const liste = JSON.parse(brut);
-      if (Array.isArray(liste) && liste.length) return liste;
+      if (Array.isArray(liste)) return liste;
     }
-  } catch (_) { /* stockage illisible : on repart des valeurs par défaut */ }
-  return [...SOCIETES_DEFAUT];
+  } catch (_) { /* stockage illisible : on repart de zéro */ }
+  return [];
 }
 
 function sauverSocietes() {
   localStorage.setItem(CLE_SOCIETES, JSON.stringify(SOCIETES));
 }
 
-const SOCIETES = chargerSocietes();
+function sauverTaches() {
+  localStorage.setItem(CLE_TACHES, JSON.stringify(TACHES));
+}
+
+const SOCIETES = chargerListe(CLE_SOCIETES);
+const TACHES = chargerListe(CLE_TACHES);
 
 // Couleurs proposées pour les nouvelles sociétés, dans cet ordre
 const PALETTE = ['#4FA3E8', '#E8A14F', '#C07CE8', '#5ED3A8', '#E86A6A',
@@ -57,39 +56,18 @@ function hslVersHex(h, s, l) {
 const AUJOURDHUI = new Date();
 AUJOURDHUI.setHours(0, 0, 0, 0);
 
-function dansJours(n) {
-  const d = new Date(AUJOURDHUI);
-  d.setDate(d.getDate() + n);
-  return d;
+// La deadline est stockée en texte « AAAA-MM-JJ » (le format du champ date)
+function dateDeadline(tache) {
+  const [annee, mois, jour] = tache.deadline.split('-').map(Number);
+  return new Date(annee, mois - 1, jour);
 }
-
-const TACHES = [
-  { id: 't1', nom: 'Relancer le client sur le devis',
-    descriptif: 'Rappeler M. Perrin au sujet du devis n°2026-118 envoyé fin juillet, et négocier le délai de livraison.',
-    deadline: dansJours(3), societe: 'alpha', importance: 85 },
-  { id: 't2', nom: 'Envoyer les factures de juillet',
-    descriptif: 'Éditer et envoyer les quatre factures de juillet, bons de livraison en pièce jointe.',
-    deadline: dansJours(6), societe: 'batir', importance: 55 },
-  { id: 't3', nom: 'Préparer la réunion trimestrielle',
-    descriptif: 'Préparer le support et les chiffres du trimestre pour la réunion du comité.',
-    deadline: dansJours(11), societe: 'novatech', importance: 70 },
-  { id: 't4', nom: 'Mettre à jour le contrat de maintenance',
-    descriptif: 'Intégrer la nouvelle grille tarifaire au contrat et l\'envoyer pour signature.',
-    deadline: dansJours(18), societe: 'alpha', importance: 35 },
-  { id: 't5', nom: 'Valider la maquette du site',
-    descriptif: 'Relire la maquette envoyée par l\'agence et lister les corrections avant validation.',
-    deadline: dansJours(26), societe: 'novatech', importance: 90 },
-  { id: 't6', nom: 'Commander les fournitures de chantier',
-    descriptif: 'Passer la commande trimestrielle avant la fermeture estivale du fournisseur.',
-    deadline: dansJours(45), societe: 'batir', importance: 25 },
-];
 
 // ---- Urgence : calculée depuis la deadline (voir plan.md) ---------------
 // 4 zones sur l'axe : faible (> 1 mois), moyenne (2 sem – 1 mois),
 // grave (1 – 2 sem), totale (< 1 sem, deadlines dépassées comprises).
 
 function joursRestants(tache) {
-  return Math.round((tache.deadline - AUJOURDHUI) / 86400000);
+  return Math.round((dateDeadline(tache) - AUJOURDHUI) / 86400000);
 }
 
 function niveauUrgence(jours) {
@@ -156,18 +134,28 @@ function afficherSocietes() {
 function afficherTaches() {
   const liste = $('#liste-taches');
   liste.innerHTML = '';
-  for (const tache of TACHES) {
+
+  if (!TACHES.length) {
+    const li = document.createElement('li');
+    li.className = 'liste-vide';
+    li.textContent = 'Aucune tâche pour l\'instant — clique sur « + Nouvelle tâche » pour commencer.';
+    liste.appendChild(li);
+    return;
+  }
+
+  const ordonnees = [...TACHES].sort((a, b) => a.deadline.localeCompare(b.deadline));
+  for (const tache of ordonnees) {
     const societe = societeDe(tache);
     const li = document.createElement('li');
     li.className = 'tache';
     li.dataset.id = tache.id;
-    li.style.setProperty('--couleur', societe.couleur);
+    li.style.setProperty('--couleur', societe ? societe.couleur : '');
     li.innerHTML = `
       <span class="tache-nom"></span>
       <span class="tache-meta"></span>`;
     li.querySelector('.tache-nom').textContent = tache.nom;
     li.querySelector('.tache-meta').textContent =
-      `${societe.nom} · échéance ${FORMAT_DATE.format(tache.deadline)}`;
+      `${societe ? societe.nom : '?'} · échéance ${FORMAT_DATE.format(dateDeadline(tache))}`;
     liste.appendChild(li);
   }
 }
@@ -206,7 +194,7 @@ function remplirFiche(tache) {
   $('#fiche-pastille').style.setProperty('--couleur', societe.couleur);
   $('#fiche-societe').textContent = societe.nom;
   $('#fiche-deadline').textContent =
-    `Échéance ${FORMAT_DATE.format(tache.deadline)}` +
+    `Échéance ${FORMAT_DATE.format(dateDeadline(tache))}` +
     (jours < 0 ? ` (dépassée de ${-jours} j)` : jours === 0 ? ' (aujourd\'hui)' : ` (dans ${jours} j)`);
   $('#fiche-urgence').textContent =
     `Urgence ${niveauUrgence(jours).toLowerCase()} · importance ${tache.importance}/100`;
@@ -303,6 +291,77 @@ function brancherEvenements() {
   $('#btn-nouvelle-societe').addEventListener('click', ouvrirDialogueSociete);
   $('#societe-annuler').addEventListener('click', () => $('#dialogue-societe').close());
   $('#formulaire-societe').addEventListener('submit', validerNouvelleSociete);
+
+  // ajout d'une tâche
+  $('#btn-nouvelle-tache').addEventListener('click', ouvrirDialogueTache);
+  $('#tache-annuler').addEventListener('click', () => $('#dialogue-tache').close());
+  $('#formulaire-tache').addEventListener('submit', validerNouvelleTache);
+  $('#tache-importance').addEventListener('input', (e) => {
+    $('#tache-importance-valeur').textContent = e.target.value;
+  });
+}
+
+// ---- Ajout d'une tâche ---------------------------------------------------
+
+function ouvrirDialogueTache() {
+  const erreur = $('#tache-erreur');
+  erreur.hidden = true;
+
+  // la liste déroulante des sociétés reflète le panneau
+  const select = $('#tache-societe');
+  select.innerHTML = '';
+  for (const societe of SOCIETES) {
+    const option = document.createElement('option');
+    option.value = societe.id;
+    option.textContent = societe.nom;
+    select.appendChild(option);
+  }
+
+  $('#tache-nom').value = '';
+  $('#tache-desc').value = '';
+  $('#tache-deadline').value = '';
+  $('#tache-deadline').min = AUJOURDHUI.toISOString().slice(0, 10);
+  $('#tache-importance').value = 50;
+  $('#tache-importance-valeur').textContent = '50';
+  $('#dialogue-tache').showModal();
+
+  if (!SOCIETES.length) {
+    erreur.textContent = 'Crée d\'abord une société (bouton « + Nouvelle société » du dashboard).';
+    erreur.hidden = false;
+  }
+}
+
+function validerNouvelleTache(e) {
+  e.preventDefault();
+  const erreur = $('#tache-erreur');
+  const nom = $('#tache-nom').value.trim();
+  const deadline = $('#tache-deadline').value;
+  const societe = $('#tache-societe').value;
+
+  const probleme =
+    !SOCIETES.length ? 'Crée d\'abord une société (bouton « + Nouvelle société » du dashboard).' :
+    !nom             ? 'Donne un nom à la tâche.' :
+    !deadline        ? 'Choisis une deadline.' :
+    !societe         ? 'Choisis la société concernée.' : null;
+
+  if (probleme) {
+    erreur.textContent = probleme;
+    erreur.hidden = false;
+    return;
+  }
+
+  TACHES.push({
+    id: crypto.randomUUID(),
+    nom,
+    descriptif: $('#tache-desc').value.trim(),
+    deadline,
+    societe,
+    importance: Number($('#tache-importance').value),
+  });
+  sauverTaches();
+  afficherTaches();
+  afficherPins();
+  $('#dialogue-tache').close();
 }
 
 // ---- Ajout d'une société -------------------------------------------------

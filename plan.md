@@ -125,7 +125,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 5 — Gestion des sociétés
+## Bloc 5 — Gestion des sociétés ✅
 
 **Avant.** Les 3 sociétés sont écrites en dur dans le code.
 
@@ -193,7 +193,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 | 2 | Maquette dashboard | Tout l'écran desktop, données factices | ✅ |
 | 3 | Version mobile | Défilement vertical propre | ✅ |
 | 4 | Graphique interactif | Pins, survol, fiche, surbrillance | ✅ |
-| 5 | Sociétés | Ajout + couleurs, données conservées |
+| 5 | Sociétés | Ajout + couleurs, données conservées | ✅ |
 | 6 | Création de tâches | Formulaire complet fonctionnel |
 | 7 | Terminer une tâche | Cycle de vie complet |
 | 8 | Firebase | Téléphone et ordinateur synchronisés |

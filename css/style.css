@@ -1,6 +1,7 @@
 /* == MarkTask — thème sombre, couleurs tirées du logo ==================== */
 
 :root {
+  color-scheme: dark;       /* calendriers, listes et cases natifs en sombre */
   --fond: #07070A;          /* fond de page (noir du logo) */
   --carte: #0E0F12;         /* fond des cartes */
   --carte-bord: #1D2025;    /* liseré des cartes */
@@ -536,6 +537,12 @@ body {
 
 .tache-faite .tache-nom { text-decoration: line-through; }
 
+.liste-vide {
+  padding: 10px 2px;
+  font-size: 0.9rem;
+  color: var(--texte-2nd);
+}
+
 /* ---- Pins du graphique -------------------------------------------------- */
 
 .pin {
@@ -636,7 +643,10 @@ body {
   color: var(--texte-2nd);
 }
 
-.champ input[type="text"] {
+.champ input[type="text"],
+.champ input[type="date"],
+.champ textarea,
+.champ select {
   padding: 10px 12px;
   border: 1px solid var(--carte-bord);
   border-radius: 9px;
@@ -645,9 +655,16 @@ body {
   font: inherit;
 }
 
-.champ input[type="text"]:focus-visible {
+.champ textarea { resize: vertical; }
+
+.champ :is(input, textarea, select):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -1px;
+}
+
+.champ input[type="range"] {
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .champ-couleur input {
