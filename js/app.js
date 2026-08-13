@@ -503,7 +503,7 @@ function brancherEvenements() {
     if (modePlacement) { quitterPlacement(); return; }
     entrerPlacement();
   });
-  $('#tache-annuler').addEventListener('click', () => $('#dialogue-tache').close());
+  $('#tache-fermer').addEventListener('click', () => $('#dialogue-tache').close());
   $('#formulaire-tache').addEventListener('submit', validerTache);
   $('#tache-supprimer').addEventListener('click', supprimerTacheEnEdition);
   $('#tache-importance').addEventListener('input', (e) => {

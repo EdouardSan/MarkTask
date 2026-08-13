@@ -20,7 +20,7 @@
       </summary>
       <nav class="menu-panneau">
         <a class="menu-lien" href="taches-realisees.html">Tâches réalisées</a>
-        <span class="menu-version">version 31</span>
+        <span class="menu-version">version 32</span>
       </nav>
     </details>
     <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
@@ -117,6 +117,7 @@
 
   <dialog class="dialogue" id="dialogue-tache">
     <form id="formulaire-tache" novalidate>
+      <button class="dialogue-fermer" type="button" id="tache-fermer" aria-label="Fermer">&times;</button>
       <h2 class="dialogue-titre" id="tache-dialogue-titre">Nouvelle tâche</h2>
       <label class="champ">
         Nom de la tâche
@@ -141,7 +142,6 @@
       <p class="dialogue-erreur" id="tache-erreur" hidden></p>
       <div class="dialogue-actions">
         <button class="btn-danger" type="button" id="tache-supprimer" hidden>Supprimer</button>
-        <button class="btn-filtre" type="button" id="tache-annuler">Annuler</button>
         <button class="btn-principal" type="submit" id="tache-valider">Ajouter</button>
       </div>
     </form>
