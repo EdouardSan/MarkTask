@@ -1,0 +1,57 @@
+/* == MarkTask — thème sombre, couleurs tirées du logo ==================== */
+
+:root {
+  --fond: #07070A;          /* fond de page (noir du logo) */
+  --carte: #0E0F12;         /* fond des cartes */
+  --carte-bord: #1D2025;    /* liseré des cartes */
+  --texte: #FAF9FA;         /* blanc du logo */
+  --texte-2nd: #8B909A;     /* texte secondaire */
+  --accent: #7CCB53;        /* vert du logo */
+  --accent-fonce: #4E8A32;
+
+  --rayon: 14px;            /* arrondi des cartes */
+  --marge: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--fond);
+  color: var(--texte);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- En-tête ----------------------------------------------------------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: var(--marge);
+}
+
+.app-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ---- Dashboard (rempli au bloc 2) -------------------------------------- */
+
+.dashboard {
+  padding: 0 var(--marge) var(--marge);
+}
