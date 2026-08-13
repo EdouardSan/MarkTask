@@ -281,7 +281,9 @@ body {
 
 .carte-graphique {
   position: relative;
-  padding: 18px 18px 14px;
+  /* la zone de tracé commence sous le bouton Nouvelle tâche :
+     aucun pin ne peut se cacher derrière */
+  padding: 68px 18px 14px;
 }
 
 /* le bouton Nouvelle tâche vit dans le coin haut-droit du graphique */
