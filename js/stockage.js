@@ -35,20 +35,28 @@ const Stockage = {
     this.mode = 'nuage';
     firebase.initializeApp(FIREBASE_CONFIG);
     const db = firebase.firestore();
-    // cache hors-ligne : l'app s'ouvre et fonctionne sans réseau,
-    // puis se resynchronise toute seule
-    db.enablePersistence({ synchronizeTabs: true }).catch(() => { /* déjà actif ailleurs */ });
-
     this._racine = db.collection('listes').doc(MARKTASK_LISTE_ID);
 
-    this._racine.collection('societes').onSnapshot((instantane) => {
-      this.societes = instantane.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      this._onChange();
-    });
-    this._racine.collection('taches').onSnapshot((instantane) => {
-      this.taches = instantane.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      this._onChange();
-    });
+    const sAbonner = () => {
+      this._racine.collection('societes').onSnapshot((instantane) => {
+        this.societes = instantane.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        this._onChange();
+      });
+      this._racine.collection('taches').onSnapshot((instantane) => {
+        this.taches = instantane.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        this._onChange();
+      });
+    };
+
+    // Cache hors-ligne : l'app s'ouvre et fonctionne sans réseau, puis se
+    // resynchronise toute seule. Le mode multi-onglets échoue sur certains
+    // navigateurs (Safari iOS notamment) : on se replie alors sur le mode
+    // simple, et en dernier recours on continue sans cache.
+    // L'abonnement aux données n'est lancé qu'une fois ce point réglé.
+    db.enablePersistence({ synchronizeTabs: true })
+      .catch(() => db.enablePersistence())
+      .catch(() => { /* pas de cache possible : app utilisable en ligne */ })
+      .then(sAbonner, sAbonner);
   },
 
   // ---- Sociétés ----
