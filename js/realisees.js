@@ -1,27 +1,6 @@
 // MarkTask — page « Tâches réalisées »
-// Lit le même stockage que le dashboard (js/app.js) : restaurer une tâche la
-// renvoie sur le dashboard, la supprimer l'efface définitivement.
-
-const CLE_SOCIETES = 'marktask.societes.v1';
-const CLE_TACHES = 'marktask.taches.v1';
-
-function chargerListe(cle) {
-  try {
-    const brut = localStorage.getItem(cle);
-    if (brut) {
-      const liste = JSON.parse(brut);
-      if (Array.isArray(liste)) return liste;
-    }
-  } catch (_) { /* stockage illisible */ }
-  return [];
-}
-
-const SOCIETES = chargerListe(CLE_SOCIETES);
-const TACHES = chargerListe(CLE_TACHES);
-
-function sauverTaches() {
-  localStorage.setItem(CLE_TACHES, JSON.stringify(TACHES));
-}
+// Même couche Stockage que le dashboard : restaurer une tâche la renvoie sur
+// le dashboard, la supprimer l'efface définitivement (partout, une fois synchronisé).
 
 const FORMAT_DATE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' });
 
@@ -34,7 +13,7 @@ function afficherRealisees() {
   const liste = document.getElementById('liste-realisees');
   liste.innerHTML = '';
 
-  const realisees = TACHES.filter((t) => t.faite);
+  const realisees = Stockage.taches.filter((t) => t.faite);
   if (!realisees.length) {
     const li = document.createElement('li');
     li.className = 'liste-vide';
@@ -47,7 +26,7 @@ function afficherRealisees() {
   realisees.sort((a, b) => (b.realiseLe || '').localeCompare(a.realiseLe || ''));
 
   for (const tache of realisees) {
-    const societe = SOCIETES.find((s) => s.id === tache.societe);
+    const societe = Stockage.societes.find((s) => s.id === tache.societe);
     const li = document.createElement('li');
     li.className = 'tache tache-faite';
     li.dataset.id = tache.id;
@@ -70,21 +49,16 @@ function afficherRealisees() {
 document.getElementById('liste-realisees').addEventListener('click', (e) => {
   const li = e.target.closest('.tache');
   if (!li) return;
-  const tache = TACHES.find((t) => t.id === li.dataset.id);
+  const tache = Stockage.taches.find((t) => t.id === li.dataset.id);
   if (!tache) return;
 
   if (e.target.closest('.btn-restaurer')) {
     // la tâche redevient « à réaliser » : elle réapparaît sur le dashboard
-    delete tache.faite;
-    delete tache.realiseLe;
-    sauverTaches();
-    afficherRealisees();
+    Stockage.majTache({ ...tache, faite: false, realiseLe: null });
   } else if (e.target.closest('.btn-supprimer')) {
     if (!confirm('Supprimer définitivement cette tâche ?')) return;
-    TACHES.splice(TACHES.indexOf(tache), 1);
-    sauverTaches();
-    afficherRealisees();
+    Stockage.supprimerTache(tache.id);
   }
 });
 
-afficherRealisees();
+Stockage.init(afficherRealisees);

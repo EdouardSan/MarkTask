@@ -153,7 +153,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 7 — Terminer une tâche
+## Bloc 7 — Terminer une tâche ✅
 
 **Avant.** Les tâches créées restent « à réaliser » pour toujours.
 
@@ -203,7 +203,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 | 4 | Graphique interactif | Pins, survol, fiche, surbrillance | ✅ |
 | 5 | Sociétés | Ajout + couleurs, données conservées | ✅ |
 | 6 | Création de tâches | Formulaire complet fonctionnel | ✅ |
-| 7 | Terminer une tâche | Cycle de vie complet |
+| 7 | Terminer une tâche | Cycle de vie complet | ✅ |
 | 8 | Firebase | Téléphone et ordinateur synchronisés |
 | 9 | Hors-ligne + PWA | App installable, marche sans réseau |
 | 10 | Mise en ligne | Lien à donner à l'utilisateur |

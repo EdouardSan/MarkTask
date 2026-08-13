@@ -1,33 +1,10 @@
-// MarkTask — logique de l'application
-// Toutes les données (sociétés et tâches) sont créées par l'utilisateur et
-// sauvegardées dans le navigateur (localStorage, remplacé par Firebase au bloc 8).
+// MarkTask — logique de l'application (dashboard)
+// Les données passent par la couche Stockage (js/stockage.js) : localStorage
+// par défaut, Firestore synchronisé dès que FIREBASE_CONFIG est renseigné.
 
-// ---- Stockage navigateur -------------------------------------------------
-
-const CLE_SOCIETES = 'marktask.societes.v1';
-const CLE_TACHES = 'marktask.taches.v1';
-
-function chargerListe(cle) {
-  try {
-    const brut = localStorage.getItem(cle);
-    if (brut) {
-      const liste = JSON.parse(brut);
-      if (Array.isArray(liste)) return liste;
-    }
-  } catch (_) { /* stockage illisible : on repart de zéro */ }
-  return [];
-}
-
-function sauverSocietes() {
-  localStorage.setItem(CLE_SOCIETES, JSON.stringify(SOCIETES));
-}
-
-function sauverTaches() {
-  localStorage.setItem(CLE_TACHES, JSON.stringify(TACHES));
-}
-
-const SOCIETES = chargerListe(CLE_SOCIETES);
-const TACHES = chargerListe(CLE_TACHES);
+// Miroirs locaux des données, rafraîchis par Stockage à chaque changement
+let SOCIETES = [];
+let TACHES = [];
 
 // Couleurs proposées pour les nouvelles sociétés, dans cet ordre
 const PALETTE = ['#4FA3E8', '#E8A14F', '#C07CE8', '#5ED3A8', '#E86A6A',
@@ -200,11 +177,11 @@ let tacheATerminer = null;      // id de la tâche visée par la confirmation de
 // ---- Terminer une tâche (et fêter ça) ------------------------------------
 
 function terminerTache(tache) {
-  tache.faite = true;
-  tache.realiseLe = new Date().toISOString().slice(0, 10);
-  sauverTaches();
-  afficherTaches();
-  afficherPins();
+  Stockage.majTache({
+    ...tache,
+    faite: true,
+    realiseLe: new Date().toISOString().slice(0, 10),
+  });
   celebrer();
 }
 
@@ -501,27 +478,20 @@ function validerTache(e) {
 
   if (tacheEnEdition) {
     const tache = TACHES.find((t) => t.id === tacheEnEdition);
-    Object.assign(tache, champs);
+    Stockage.majTache({ ...tache, ...champs });
   } else {
-    TACHES.push({ id: crypto.randomUUID(), ...champs });
+    Stockage.creerTache({ id: crypto.randomUUID(), ...champs });
   }
 
   tacheEnEdition = null;
-  sauverTaches();
-  afficherTaches();
-  afficherPins();
   $('#dialogue-tache').close();
 }
 
 function supprimerTacheEnEdition() {
   if (!tacheEnEdition) return;
   if (!confirm('Supprimer définitivement cette tâche ?')) return;
-  const index = TACHES.findIndex((t) => t.id === tacheEnEdition);
-  if (index !== -1) TACHES.splice(index, 1);
+  Stockage.supprimerTache(tacheEnEdition);
   tacheEnEdition = null;
-  sauverTaches();
-  afficherTaches();
-  afficherPins();
   $('#dialogue-tache').close();
 }
 
@@ -550,14 +520,11 @@ function validerNouvelleSociete(e) {
     return;
   }
 
-  SOCIETES.push({
+  Stockage.creerSociete({
     id: crypto.randomUUID(),
     nom,
     couleur: $('#societe-couleur').value,
   });
-  sauverSocietes();
-  afficherSocietes();
-  afficherPins();
   $('#dialogue-societe').close();
 }
 
@@ -569,7 +536,13 @@ function cocherTout(etat) {
 
 // ---- Démarrage -----------------------------------------------------------
 
-afficherSocietes();
-afficherTaches();
-afficherPins();
+function rafraichirTout() {
+  SOCIETES = Stockage.societes;
+  TACHES = Stockage.taches;
+  afficherSocietes();
+  afficherTaches();
+  afficherPins();
+}
+
 brancherEvenements();
+Stockage.init(rafraichirTout);
