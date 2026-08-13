@@ -135,21 +135,25 @@ function afficherTaches() {
     li.className = 'tache';
     li.dataset.id = tache.id;
     li.style.setProperty('--couleur', societe ? societe.couleur : '');
+    // même mécanisme natif que le panneau « Tâches à réaliser » lui-même :
+    // l'intitulé est la poignée, le navigateur gère l'ouverture/fermeture
     li.innerHTML = `
-      <span class="tache-nom"></span>
-      <span class="tache-meta"></span>
-      <div class="tache-detail" hidden>
-        <p class="tache-detail-desc"></p>
-        <span class="tache-detail-ligne tache-detail-deadline"></span>
-        <span class="tache-detail-ligne tache-detail-urgence"></span>
-      </div>
+      <details class="tache-details">
+        <summary class="tache-resume">
+          <span class="chevron" aria-hidden="true"></span>
+          <span class="tache-nom"></span>
+        </summary>
+        <div class="tache-detail">
+          <span class="tache-detail-ligne tache-detail-societe"></span>
+          <p class="tache-detail-desc"></p>
+          <span class="tache-detail-ligne tache-detail-deadline"></span>
+          <span class="tache-detail-ligne tache-detail-urgence"></span>
+        </div>
+      </details>
       <input class="tache-case" type="checkbox" title="Marquer comme réalisée">`;
     li.querySelector('.tache-nom').textContent = tache.nom;
-    // la société n'apparaît qu'une fois la tâche dépliée (l'échéance détaillée
-    // est déjà dans le bloc de détail)
-    li.querySelector('.tache-meta').textContent = societe ? societe.nom : '?';
+    li.querySelector('.tache-detail-societe').textContent = societe ? societe.nom : '?';
 
-    // contenu complet, affiché quand la tâche est dépliée
     const desc = li.querySelector('.tache-detail-desc');
     desc.textContent = tache.descriptif || '';
     desc.hidden = !tache.descriptif;
@@ -159,10 +163,14 @@ function afficherTaches() {
     li.querySelector('.tache-detail-urgence').textContent =
       `Urgence ${niveauUrgence(jours).toLowerCase()} · importance ${tache.importance}/100`;
 
-    if (tachesDepliees.has(tache.id)) {
-      li.classList.add('tache-depliee');
-      li.querySelector('.tache-detail').hidden = false;
-    }
+    // l'état ouvert/fermé survit aux redessins (synchronisations)
+    const details = li.querySelector('.tache-details');
+    details.open = tachesDepliees.has(tache.id);
+    details.addEventListener('toggle', () => {
+      if (details.open) tachesDepliees.add(tache.id);
+      else tachesDepliees.delete(tache.id);
+    });
+
     liste.appendChild(li);
   }
 }
@@ -469,16 +477,6 @@ function brancherEvenements() {
   $('#fiche-terminer').addEventListener('touchend', (e) => {
     e.preventDefault();
     proposerTerminerDepuisFiche();
-  });
-
-  // clic sur une tâche : elle se déplie (contenu complet) ou se replie
-  $('#liste-taches').addEventListener('click', (e) => {
-    if (e.target.closest('.tache-case')) return;   // la case termine, ne déplie pas
-    const li = e.target.closest('.tache');
-    if (!li) return;
-    if (tachesDepliees.has(li.dataset.id)) tachesDepliees.delete(li.dataset.id);
-    else tachesDepliees.add(li.dataset.id);
-    afficherTaches();
   });
 
   // cocher une tâche : elle part dans « Tâches réalisées »

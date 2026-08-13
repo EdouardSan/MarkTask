@@ -533,23 +533,27 @@ body {
   background: var(--couleur, var(--texte-2nd));
 }
 
-#liste-taches .tache { cursor: pointer; }   /* un clic déplie / replie */
-
-/* mode synthétique : uniquement l'intitulé — la société n'apparaît que dépliée */
-#liste-taches .tache:not(.tache-depliee) .tache-meta { display: none; }
-
 .tache-nom {
-  display: block;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
-/* contenu complet d'une tâche : visible uniquement quand elle est dépliée
-   (display piloté par la classe — ne jamais compter sur l'attribut hidden
-   face à une règle display, leçon apprise avec la coche) */
-.tache-detail { display: none; }
+/* l'intitulé est la poignée du <details> de la tâche */
+.tache-resume {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
 
-.tache-depliee .tache-detail {
+.tache-resume::-webkit-details-marker { display: none; }
+
+.tache-details[open] > .tache-resume .chevron { transform: rotate(90deg); }
+
+/* contenu complet : le <details> le masque nativement quand il est fermé */
+.tache-detail {
   display: flex;
   flex-direction: column;
   gap: 4px;
