@@ -604,6 +604,76 @@ body {
   box-shadow: inset 0 0 0 1px var(--accent-fonce);
 }
 
+/* ---- Boîtes de dialogue (Nouvelle société, puis Nouvelle tâche) --------- */
+
+.dialogue {
+  margin: auto;                 /* centrée à l'écran */
+  width: min(400px, calc(100vw - 2 * var(--marge)));
+  padding: 22px;
+  border: 1px solid var(--carte-bord);
+  border-radius: var(--rayon);
+  background: var(--carte);
+  color: var(--texte);
+}
+
+.dialogue::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.dialogue-titre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-size: 0.85rem;
+  color: var(--texte-2nd);
+}
+
+.champ input[type="text"] {
+  padding: 10px 12px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 9px;
+  background: var(--fond);
+  color: var(--texte);
+  font: inherit;
+}
+
+.champ input[type="text"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.champ-couleur input {
+  width: 64px;
+  height: 36px;
+  padding: 2px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 9px;
+  background: var(--fond);
+  cursor: pointer;
+}
+
+.dialogue-erreur {
+  margin: -4px 0 12px;
+  font-size: 0.85rem;
+  color: #E88989;
+}
+
+.dialogue-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dialogue-actions .btn-filtre { flex: none; padding: 10px 16px; font-size: 0.9rem; }
+
 /* ==== Version mobile : tout s'empile, la page défile ==================== */
 
 @media (max-width: 820px) {

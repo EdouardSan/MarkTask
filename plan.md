@@ -115,7 +115,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 4 — Graphique interactif
+## Bloc 4 — Graphique interactif ✅
 
 **Avant.** Le cadre du graphique est vide, les fausses tâches ne vivent que dans la liste.
 
@@ -192,7 +192,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 | 1 | Squelette | Page sombre avec logo | ✅ |
 | 2 | Maquette dashboard | Tout l'écran desktop, données factices | ✅ |
 | 3 | Version mobile | Défilement vertical propre | ✅ |
-| 4 | Graphique interactif | Pins, survol, fiche, surbrillance |
+| 4 | Graphique interactif | Pins, survol, fiche, surbrillance | ✅ |
 | 5 | Sociétés | Ajout + couleurs, données conservées |
 | 6 | Création de tâches | Formulaire complet fonctionnel |
 | 7 | Terminer une tâche | Cycle de vie complet |

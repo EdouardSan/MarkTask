@@ -1,14 +1,58 @@
 // MarkTask — logique de l'application
-// Bloc 4 : graphique interactif. Les données sont encore factices ;
-// elles seront créées par l'utilisateur au bloc 6 puis synchronisées au bloc 8.
+// Bloc 4 : graphique interactif. Bloc 5 : sociétés réelles, sauvegardées
+// dans le navigateur (localStorage, remplacé par Firebase au bloc 8).
+// Les tâches restent factices jusqu'au bloc 6.
 
-// ---- Données factices ---------------------------------------------------
+// ---- Sociétés : chargées depuis le navigateur ---------------------------
 
-const SOCIETES = [
+const CLE_SOCIETES = 'marktask.societes.v1';
+
+const SOCIETES_DEFAUT = [
   { id: 'alpha',    nom: 'Alpha Conseil', couleur: '#4FA3E8' },
   { id: 'batir',    nom: 'Bâtir & Co',    couleur: '#E8A14F' },
   { id: 'novatech', nom: 'Novatech',      couleur: '#C07CE8' },
 ];
+
+function chargerSocietes() {
+  try {
+    const brut = localStorage.getItem(CLE_SOCIETES);
+    if (brut) {
+      const liste = JSON.parse(brut);
+      if (Array.isArray(liste) && liste.length) return liste;
+    }
+  } catch (_) { /* stockage illisible : on repart des valeurs par défaut */ }
+  return [...SOCIETES_DEFAUT];
+}
+
+function sauverSocietes() {
+  localStorage.setItem(CLE_SOCIETES, JSON.stringify(SOCIETES));
+}
+
+const SOCIETES = chargerSocietes();
+
+// Couleurs proposées pour les nouvelles sociétés, dans cet ordre
+const PALETTE = ['#4FA3E8', '#E8A14F', '#C07CE8', '#5ED3A8', '#E86A6A',
+                 '#EFD35F', '#7B8FF2', '#E88BC4', '#9AD65E', '#F09B59'];
+
+function couleurProposee() {
+  const utilisees = new Set(SOCIETES.map((s) => s.couleur.toUpperCase()));
+  for (const couleur of PALETTE) {
+    if (!utilisees.has(couleur.toUpperCase())) return couleur;
+  }
+  // palette épuisée : teinte aléatoire bien saturée
+  const teinte = Math.floor(Math.random() * 360);
+  return `#${hslVersHex(teinte, 62, 62)}`;
+}
+
+function hslVersHex(h, s, l) {
+  s /= 100; l /= 100;
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0), f(8), f(4)]
+    .map((v) => Math.round(v * 255).toString(16).padStart(2, '0'))
+    .join('');
+}
 
 const AUJOURDHUI = new Date();
 AUJOURDHUI.setHours(0, 0, 0, 0);
@@ -87,15 +131,22 @@ function societesCochees() {
 
 function afficherSocietes() {
   const liste = $('#liste-societes');
+  // conserve l'état des cases avant de redessiner (nouvelle société : cochée)
+  const cases = document.querySelectorAll('.societe-case');
+  const decochees = new Set();
+  cases.forEach((c) => { if (!c.checked) decochees.add(c.dataset.societe); });
+
   liste.innerHTML = '';
   for (const societe of SOCIETES) {
     const li = document.createElement('li');
     li.className = 'societe';
     li.innerHTML = `
       <label class="societe-label">
-        <input class="societe-case" type="checkbox" checked data-societe="${societe.id}">
-        <span class="pastille" style="--couleur:${societe.couleur}"></span>${societe.nom}
+        <input class="societe-case" type="checkbox" data-societe="${societe.id}">
+        <span class="pastille" style="--couleur:${societe.couleur}"></span>
       </label>`;
+    li.querySelector('.societe-case').checked = !decochees.has(societe.id);
+    li.querySelector('.societe-label').append(societe.nom);
     liste.appendChild(li);
   }
 }
@@ -247,6 +298,47 @@ function brancherEvenements() {
   $('#liste-societes').addEventListener('change', afficherPins);
   $('#btn-tout-cocher').addEventListener('click', () => cocherTout(true));
   $('#btn-tout-decocher').addEventListener('click', () => cocherTout(false));
+
+  // ajout d'une société
+  $('#btn-nouvelle-societe').addEventListener('click', ouvrirDialogueSociete);
+  $('#societe-annuler').addEventListener('click', () => $('#dialogue-societe').close());
+  $('#formulaire-societe').addEventListener('submit', validerNouvelleSociete);
+}
+
+// ---- Ajout d'une société -------------------------------------------------
+
+function ouvrirDialogueSociete() {
+  $('#societe-nom').value = '';
+  $('#societe-couleur').value = couleurProposee();
+  $('#societe-erreur').hidden = true;
+  $('#dialogue-societe').showModal();
+}
+
+function validerNouvelleSociete(e) {
+  e.preventDefault();
+  const nom = $('#societe-nom').value.trim();
+  const erreur = $('#societe-erreur');
+
+  if (!nom) {
+    erreur.textContent = 'Donne un nom à la société.';
+    erreur.hidden = false;
+    return;
+  }
+  if (SOCIETES.some((s) => s.nom.toLowerCase() === nom.toLowerCase())) {
+    erreur.textContent = 'Cette société existe déjà dans la liste.';
+    erreur.hidden = false;
+    return;
+  }
+
+  SOCIETES.push({
+    id: crypto.randomUUID(),
+    nom,
+    couleur: $('#societe-couleur').value,
+  });
+  sauverSocietes();
+  afficherSocietes();
+  afficherPins();
+  $('#dialogue-societe').close();
 }
 
 function cocherTout(etat) {
