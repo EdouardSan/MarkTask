@@ -39,7 +39,11 @@
         </div>
       </section>
 
-      <section class="carte carte-societes" aria-label="Sociétés">
+      <details class="carte carte-societes" open>
+        <summary class="societes-toggle" aria-label="Afficher ou masquer le panneau Sociétés">
+          <span class="chevron-lateral" aria-hidden="true"></span>
+        </summary>
+        <div class="societes-contenu">
         <h2 class="carte-titre">Sociétés</h2>
         <div class="societes-filtres">
           <button class="btn-filtre" type="button">Tout cocher</button>
@@ -66,7 +70,8 @@
           </li>
         </ul>
         <button class="btn-secondaire" type="button">+ Nouvelle société</button>
-      </section>
+        </div>
+      </details>
 
     </div>
 

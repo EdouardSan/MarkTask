@@ -12,7 +12,11 @@ L'utilisateur ouvre un lien, c'est tout : pas de compte, pas d'installation, pas
 ## Direction design
 
 - Sources : `assets/logo-512.png` et les 4 références dans `design/`.
-- Fond très sombre, cartes arrondies bien délimitées, texte blanc, **vert du logo comme unique couleur d'accent** (boutons, éléments actifs). Les pins du graphique portent les couleurs des sociétés.
+- Fond très sombre, cartes arrondies bien délimitées, texte blanc. Les pins du graphique portent les couleurs des sociétés.
+- **Charte noire et bleue depuis le 13/08/2026** : les couleurs d'accent sont les deux
+  bleus du logo SMMART — bleu clair `#AFCFFE` (boutons, cases à cocher, partie
+  bleue du M du logo, recolorée depuis le vert d'origine conservé dans
+  `design/logo-vert-original.png`) et bleu foncé `#2F5596` (contours, survols).
 - Desktop : tout tient sur un seul écran (dashboard). Mobile : les mêmes cartes empilées verticalement, on fait défiler.
 
 ## Fonctionnement du graphique (décidé le 13/08/2026)
@@ -46,6 +50,9 @@ Révisions demandées après la maquette :
 - Le panneau Sociétés sert aussi de **filtre du graphique** : chaque société a une
   case à cocher (cochée = ses tâches visibles sur le graphique, décochée =
   masquées), plus deux boutons « Tout cocher » / « Tout décocher ».
+- Le panneau Sociétés est **repliable vers la droite** : une flèche sur son bord
+  gauche le replie (il ne reste qu'une fine bande avec la flèche) et le déplie,
+  pour donner au graphique le maximum de largeur.
 - Le graphique occupe ainsi presque tout l'écran — il doit rester lisible avec
   des dizaines, voire une centaine de pins.
 

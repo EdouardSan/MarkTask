@@ -6,8 +6,8 @@
   --carte-bord: #1D2025;    /* liseré des cartes */
   --texte: #FAF9FA;         /* blanc du logo */
   --texte-2nd: #8B909A;     /* texte secondaire */
-  --accent: #7CCB53;        /* vert du logo */
-  --accent-fonce: #4E8A32;
+  --accent: #AFCFFE;        /* bleu clair du logo SMMART */
+  --accent-fonce: #2F5596;  /* bleu foncé du logo SMMART */
 
   --rayon: 14px;            /* arrondi des cartes */
   --marge: 16px;
@@ -161,7 +161,63 @@ body {
 
 .rangee-haut {
   flex: 1;                          /* le graphique prend toute la hauteur libre */
-  grid-template-columns: minmax(0, 1fr) 270px;
+  grid-template-columns: minmax(0, 1fr) auto;  /* le panneau Sociétés se replie */
+}
+
+/* ---- Panneau Sociétés repliable vers la droite ------------------------- */
+
+.carte-societes {
+  display: flex;
+  flex-direction: row;
+  padding: 0;
+}
+
+.societes-toggle {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  flex: none;
+  cursor: pointer;
+  list-style: none;
+  border-right: 1px solid var(--carte-bord);
+  border-radius: var(--rayon) 0 0 var(--rayon);
+}
+
+.carte-societes:not([open]) .societes-toggle {
+  border-right: none;
+  border-radius: var(--rayon);
+}
+
+.societes-toggle::-webkit-details-marker { display: none; }
+
+.societes-toggle:hover { background: #16181C; }
+
+.societes-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* flèche : panneau ouvert → pointe vers la droite (« je peux me ranger là ») ;
+   panneau replié → pointe vers la gauche (« je peux revenir ») */
+.chevron-lateral {
+  width: 0;
+  height: 0;
+  border-left: 7px solid var(--texte-2nd);
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.carte-societes:not([open]) .chevron-lateral {
+  border-left: none;
+  border-right: 7px solid var(--texte-2nd);
+}
+
+.societes-contenu {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  min-height: 0;
+  padding: 18px;
 }
 
 .rangee-bas {
@@ -268,7 +324,7 @@ body {
   border: none;
   border-radius: 999px;
   background: var(--accent);
-  color: #07130A;
+  color: #0A1322;
   font: inherit;
   font-size: 1rem;
   font-weight: 700;
@@ -276,7 +332,7 @@ body {
   transition: background 0.15s;
 }
 
-.btn-principal:hover { background: #8FDB66; }
+.btn-principal:hover { background: #C7DDFF; }
 
 .btn-secondaire {
   margin-top: auto;
@@ -292,7 +348,7 @@ body {
   transition: background 0.15s;
 }
 
-.btn-secondaire:hover { background: rgba(124, 203, 83, 0.12); }
+.btn-secondaire:hover { background: rgba(175, 207, 254, 0.12); }
 
 :is(.btn-principal, .btn-secondaire):focus-visible {
   outline: 2px solid var(--accent);
