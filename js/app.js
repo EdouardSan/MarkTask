@@ -188,9 +188,32 @@ function afficherPins() {
 
 const MOBILE = window.matchMedia('(max-width: 820px)');
 
-let ficheEpinglee = null;   // pin « épinglé » par un appui (mobile)
-let modePlacement = false;  // desktop : en attente d'un clic sur le graphe
-let tacheEnEdition = null;  // id de la tâche en cours de modification
+let ficheEpinglee = null;       // pin « épinglé » par un appui (mobile)
+let modePlacement = false;      // desktop : en attente d'un clic sur le graphe
+let tacheEnEdition = null;      // id de la tâche en cours de modification
+let clicSimpleEnAttente = null; // délai du simple clic, annulé par le double-clic
+
+// ---- Terminer une tâche (et fêter ça) ------------------------------------
+
+function terminerTache(tache) {
+  tache.faite = true;
+  tache.realiseLe = new Date().toISOString().slice(0, 10);
+  sauverTaches();
+  afficherTaches();
+  afficherPins();
+  celebrer();
+}
+
+function celebrer() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const fete = $('#celebration');
+  clearTimeout(celebrer.minuteur);
+  // redémarre l'animation même si elle tournait déjà
+  fete.hidden = true;
+  void fete.offsetWidth;
+  fete.hidden = false;
+  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 3000);
+}
 
 // ---- Fiche de survol -----------------------------------------------------
 
@@ -286,9 +309,13 @@ function brancherEvenements() {
     const tache = TACHES.find((t) => t.id === pin.dataset.id);
 
     if (!MOBILE.matches) {
-      // desktop : un clic sur un pin ouvre la modification
-      cacherFiche();
-      ouvrirDialogueTache(tache);
+      // desktop : un clic ouvre la modification — avec un léger délai pour
+      // laisser sa chance au double-clic (= terminer la tâche)
+      clearTimeout(clicSimpleEnAttente);
+      clicSimpleEnAttente = setTimeout(() => {
+        cacherFiche();
+        ouvrirDialogueTache(tache);
+      }, 280);
       return;
     }
 
@@ -300,6 +327,20 @@ function brancherEvenements() {
     } else {
       ficheEpinglee = pin;
       montrerFiche(pin);
+    }
+  });
+
+  // double-clic sur un pin (desktop) : terminer la tâche
+  zone.addEventListener('dblclick', (e) => {
+    if (MOBILE.matches || modePlacement) return;
+    const pin = e.target.closest('.pin');
+    if (!pin) return;
+    clearTimeout(clicSimpleEnAttente);
+    const tache = TACHES.find((t) => t.id === pin.dataset.id);
+    if (!tache) return;
+    if (confirm(`Terminer la tâche « ${tache.nom} » ?`)) {
+      cacherFiche();
+      terminerTache(tache);
     }
   });
 
@@ -321,12 +362,7 @@ function brancherEvenements() {
     const li = e.target.closest('.tache');
     if (!li || !e.target.classList.contains('tache-case')) return;
     const tache = TACHES.find((t) => t.id === li.dataset.id);
-    if (!tache) return;
-    tache.faite = true;
-    tache.realiseLe = new Date().toISOString().slice(0, 10);
-    sauverTaches();
-    afficherTaches();
-    afficherPins();
+    if (tache) terminerTache(tache);
   });
 
   // filtre par société
