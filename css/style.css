@@ -166,10 +166,22 @@ body {
 
 /* ---- Panneau Sociétés repliable vers la droite ------------------------- */
 
-.carte-societes {
+/* .carte.carte-societes : doit l'emporter sur la règle .carte définie plus bas */
+.carte.carte-societes {
+  position: relative;
   display: flex;
   flex-direction: row;
   padding: 0;
+  min-height: 0;
+}
+
+/* la case qui mémorise l'état replié : invisible mais accessible au clavier */
+.societes-repli-case {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .societes-toggle {
@@ -178,21 +190,13 @@ body {
   width: 30px;
   flex: none;
   cursor: pointer;
-  list-style: none;
   border-right: 1px solid var(--carte-bord);
   border-radius: var(--rayon) 0 0 var(--rayon);
 }
 
-.carte-societes:not([open]) .societes-toggle {
-  border-right: none;
-  border-radius: var(--rayon);
-}
-
-.societes-toggle::-webkit-details-marker { display: none; }
-
 .societes-toggle:hover { background: #16181C; }
 
-.societes-toggle:focus-visible {
+.carte-societes:has(.societes-repli-case:focus-visible) .societes-toggle {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
@@ -207,7 +211,17 @@ body {
   border-bottom: 5px solid transparent;
 }
 
-.carte-societes:not([open]) .chevron-lateral {
+/* état replié : le contenu disparaît, il ne reste que la bande à flèche */
+.carte-societes:has(.societes-repli-case:checked) .societes-contenu {
+  display: none;
+}
+
+.carte-societes:has(.societes-repli-case:checked) .societes-toggle {
+  border-right: none;
+  border-radius: var(--rayon);
+}
+
+.carte-societes:has(.societes-repli-case:checked) .chevron-lateral {
   border-left: none;
   border-right: 7px solid var(--texte-2nd);
 }
@@ -442,7 +456,8 @@ body {
 
 .liste-societes {
   list-style: none;
-  overflow-y: auto;
+  flex: 1;                    /* pousse « + Nouvelle société » en bas du panneau */
+  overflow-y: auto;           /* et défile si les sociétés sont nombreuses */
   min-height: 0;
 }
 
