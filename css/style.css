@@ -535,14 +535,21 @@ body {
 
 #liste-taches .tache { cursor: pointer; }   /* un clic déplie / replie */
 
+/* mode synthétique : uniquement l'intitulé — la société n'apparaît que dépliée */
+#liste-taches .tache:not(.tache-depliee) .tache-meta { display: none; }
+
 .tache-nom {
   display: block;
   font-size: 0.95rem;
   font-weight: 600;
 }
 
-/* contenu complet d'une tâche dépliée */
-.tache-detail {
+/* contenu complet d'une tâche : visible uniquement quand elle est dépliée
+   (display piloté par la classe — ne jamais compter sur l'attribut hidden
+   face à une règle display, leçon apprise avec la coche) */
+.tache-detail { display: none; }
+
+.tache-depliee .tache-detail {
   display: flex;
   flex-direction: column;
   gap: 4px;

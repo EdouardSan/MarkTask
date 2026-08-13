@@ -145,8 +145,9 @@ function afficherTaches() {
       </div>
       <input class="tache-case" type="checkbox" title="Marquer comme réalisée">`;
     li.querySelector('.tache-nom').textContent = tache.nom;
-    li.querySelector('.tache-meta').textContent =
-      `${societe ? societe.nom : '?'} · échéance ${FORMAT_DATE.format(dateDeadline(tache))}`;
+    // la société n'apparaît qu'une fois la tâche dépliée (l'échéance détaillée
+    // est déjà dans le bloc de détail)
+    li.querySelector('.tache-meta').textContent = societe ? societe.nom : '?';
 
     // contenu complet, affiché quand la tâche est dépliée
     const desc = li.querySelector('.tache-detail-desc');
