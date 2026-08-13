@@ -193,39 +193,44 @@ function celebrer() {
   const coche = fete.querySelector('.coche');
   const trait = fete.querySelector('.coche-trait');
   clearTimeout(celebrer.minuteur);
+
+  // 1) AFFICHER, d'abord et sans condition : quoi qu'il arrive ensuite,
+  //    la coche est à l'écran
   fete.hidden = false;
+  fete.style.opacity = '1';
 
-  // « Réduire les animations » (réglage d'accessibilité) : la coche s'affiche
-  // quand même, simplement sans mouvement
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    fete.style.opacity = '1';
-    celebrer.minuteur = setTimeout(() => {
-      fete.hidden = true;
+  // 2) puis tenter d'animer (sauf si l'utilisateur préfère éviter le mouvement) ;
+  //    si l'animation échoue, on reste simplement sur l'affichage statique
+  let animee = false;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    try {
+      for (const el of [fete, coche, trait]) {
+        el.getAnimations().forEach((a) => a.cancel());
+      }
+      const voile = fete.animate(
+        [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.78 }, { opacity: 0 }],
+        { duration: 1400, easing: 'ease', fill: 'forwards' }
+      );
+      coche.animate(
+        [{ transform: 'scale(0.45)' }, { transform: 'scale(1)' }],
+        { duration: 400, easing: 'cubic-bezier(0.2, 1.6, 0.4, 1)', fill: 'both' }
+      );
+      trait.animate(
+        [{ strokeDashoffset: 130 }, { strokeDashoffset: 0 }],
+        { duration: 450, delay: 100, easing: 'ease-out', fill: 'backwards' }
+      );
+      // l'animation du voile pilote l'opacité : on lui laisse la main
       fete.style.opacity = '';
-    }, 1200);
-    return;
+      animee = Boolean(voile);
+    } catch (_) {
+      fete.style.opacity = '1';   // retour à l'affichage statique
+    }
   }
 
-  // animations pilotées par le code (Web Animations API) : chaque appel crée
-  // des animations neuves — redémarrage garanti, sur Safari comme ailleurs
-  fete.style.opacity = '';
-  for (const el of [fete, coche, trait]) {
-    el.getAnimations().forEach((a) => a.cancel());
-  }
-  fete.animate(
-    [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.78 }, { opacity: 0 }],
-    { duration: 1400, easing: 'ease', fill: 'forwards' }
-  );
-  coche.animate(
-    [{ transform: 'scale(0.45)' }, { transform: 'scale(1)' }],
-    { duration: 400, easing: 'cubic-bezier(0.2, 1.6, 0.4, 1)', fill: 'both' }
-  );
-  trait.animate(
-    [{ strokeDashoffset: 130 }, { strokeDashoffset: 0 }],
-    { duration: 450, delay: 100, easing: 'ease-out', fill: 'backwards' }
-  );
-
-  celebrer.minuteur = setTimeout(() => { fete.hidden = true; }, 1500);
+  celebrer.minuteur = setTimeout(() => {
+    fete.hidden = true;
+    fete.style.opacity = '';
+  }, animee ? 1500 : 1200);
 }
 
 // ---- Fiche de survol -----------------------------------------------------

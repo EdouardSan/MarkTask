@@ -105,6 +105,15 @@ body {
 
 .menu-lien:hover { background: #232933; }
 
+.menu-version {
+  display: block;
+  padding: 6px 14px 4px;
+  border-top: 1px solid var(--carte-bord);
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--texte-2nd);
+}
+
 /* ---- Bouton retour (pages secondaires) --------------------------------- */
 
 .btn-retour {
