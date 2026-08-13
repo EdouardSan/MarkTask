@@ -15,11 +15,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html, body {
-  height: 100%;
-}
+html { height: 100%; }
 
 body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--fond);
   color: var(--texte);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -35,23 +36,225 @@ body {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: var(--marge);
+  padding: 14px var(--marge);
 }
 
 .app-logo {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
 }
 
 .app-title {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }
 
-/* ---- Dashboard (rempli au bloc 2) -------------------------------------- */
+/* ---- Dashboard : deux rangées qui remplissent l'écran ------------------ */
 
 .dashboard {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--marge);
   padding: 0 var(--marge) var(--marge);
 }
+
+.rangee {
+  display: grid;
+  gap: var(--marge);
+  min-height: 0;
+}
+
+.rangee-haut {
+  flex: 1.15;
+  grid-template-columns: minmax(0, 1fr) 210px 270px;
+}
+
+.rangee-bas {
+  flex: 1;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ---- Cartes ------------------------------------------------------------ */
+
+.carte {
+  background: var(--carte);
+  border: 1px solid var(--carte-bord);
+  border-radius: var(--rayon);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.carte-titre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--texte-2nd);
+  margin-bottom: 12px;
+}
+
+/* ---- Graphique urgence × importance ------------------------------------ */
+
+.carte-graphique { padding: 18px 18px 14px; }
+
+.graphique {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 6px 10px;
+}
+
+.graphique-zone {
+  position: relative;
+  border-left: 2px solid var(--carte-bord);
+  border-bottom: 2px solid var(--carte-bord);
+  border-radius: 0 0 0 4px;
+  /* léger quadrillage de fond */
+  background:
+    repeating-linear-gradient(to right, transparent 0 calc(25% - 1px), #16181C calc(25% - 1px) 25%),
+    repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), #16181C calc(25% - 1px) 25%);
+}
+
+.axe-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--texte-2nd);
+}
+
+.axe-y {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: center;
+  writing-mode: sideways-lr;
+}
+
+.axe-x {
+  grid-row: 2;
+  grid-column: 2;
+  justify-self: center;
+}
+
+/* ---- Boutons ----------------------------------------------------------- */
+
+.colonne-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.btn-principal {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #07130A;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-principal:hover { background: #8FDB66; }
+
+.btn-secondaire {
+  margin-top: auto;
+  padding: 9px 14px;
+  border: 1px solid var(--accent-fonce);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-secondaire:hover { background: rgba(124, 203, 83, 0.12); }
+
+:is(.btn-principal, .btn-secondaire):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---- Sociétés ---------------------------------------------------------- */
+
+.liste-societes {
+  list-style: none;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.societe {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 2px;
+  border-bottom: 1px solid #16181C;
+  font-size: 0.95rem;
+}
+
+.societe:last-child { border-bottom: none; }
+
+.pastille {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--couleur, var(--texte-2nd));
+}
+
+/* ---- Listes de tâches --------------------------------------------------- */
+
+.liste-taches {
+  list-style: none;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.tache {
+  position: relative;
+  padding: 8px 12px 8px 30px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background: #131519;
+}
+
+/* pastille de la société, comme dans le panneau Sociétés */
+.tache::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: 14px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--couleur, var(--texte-2nd));
+}
+
+.tache-nom {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.tache-meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--texte-2nd);
+}
+
+.tache-faite { opacity: 0.55; }
+
+.tache-faite .tache-nom { text-decoration: line-through; }

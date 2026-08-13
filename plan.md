@@ -15,14 +15,24 @@ L'utilisateur ouvre un lien, c'est tout : pas de compte, pas d'installation, pas
 - Fond très sombre, cartes arrondies bien délimitées, texte blanc, **vert du logo comme unique couleur d'accent** (boutons, éléments actifs). Les pins du graphique portent les couleurs des sociétés.
 - Desktop : tout tient sur un seul écran (dashboard). Mobile : les mêmes cartes empilées verticalement, on fait défiler.
 
-## Fonctionnement du graphique (décision à valider)
+## Fonctionnement du graphique (décidé le 13/08/2026)
 
-Le graphique croise **urgence (abscisse) × importance (ordonnée)**. Le formulaire de
-création demande : nom, descriptif, deadline, société — il ne demande pas l'urgence.
-Décision proposée : **l'urgence est calculée automatiquement à partir de la deadline**
-(plus la deadline approche, plus le pin glisse vers la droite, tout seul, jour après jour).
-L'**importance**, elle, est choisie à la création (curseur simple). Si tu préfères une
-urgence choisie à la main, on le dit avant le bloc 4 et ça ne change rien au reste.
+Le graphique croise **urgence (abscisse) × importance (ordonnée)**.
+
+L'**urgence est calculée automatiquement** à partir de la deadline, en 4 niveaux :
+
+| Niveau | Temps restant avant la deadline |
+|--------|--------------------------------|
+| Totale | moins d'1 semaine (et deadlines dépassées) |
+| Grave | entre 1 et 2 semaines |
+| Moyenne | entre 2 semaines et 1 mois |
+| Faible | plus d'1 mois |
+
+Le pin change donc de zone tout seul, jour après jour, à mesure que l'échéance
+approche. L'axe des abscisses est découpé en 4 zones correspondant à ces niveaux
+(le quadrillage du graphique reprend ce découpage).
+
+L'**importance**, elle, est choisie à la création de la tâche (curseur simple).
 
 ## Agencement desktop (d'après le schéma à la main : `design/schema-dashboard-main.jpeg`)
 

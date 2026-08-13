@@ -14,7 +14,89 @@
   </header>
 
   <main class="dashboard">
-    <!-- Bloc 2 : graphique, bouton Nouvelle tâche, sociétés, listes de tâches -->
+
+    <!-- Rangée haute : graphique / bouton Nouvelle tâche / sociétés -->
+    <div class="rangee rangee-haut">
+
+      <section class="carte carte-graphique" aria-label="Graphique urgence importance">
+        <div class="graphique">
+          <span class="axe-label axe-y">Importance</span>
+          <div class="graphique-zone">
+            <!-- Bloc 4 : les pins des tâches viendront ici -->
+          </div>
+          <span class="axe-label axe-x">Urgence</span>
+        </div>
+      </section>
+
+      <div class="colonne-action">
+        <button class="btn-principal" type="button">+ Nouvelle tâche</button>
+      </div>
+
+      <section class="carte carte-societes" aria-label="Sociétés">
+        <h2 class="carte-titre">Sociétés</h2>
+        <ul class="liste-societes">
+          <li class="societe"><span class="pastille" style="--couleur:#4FA3E8"></span>Alpha Conseil</li>
+          <li class="societe"><span class="pastille" style="--couleur:#E8A14F"></span>Bâtir &amp; Co</li>
+          <li class="societe"><span class="pastille" style="--couleur:#C07CE8"></span>Novatech</li>
+        </ul>
+        <button class="btn-secondaire" type="button">+ Nouvelle société</button>
+      </section>
+
+    </div>
+
+    <!-- Rangée basse : tâches à réaliser / tâches réalisées -->
+    <div class="rangee rangee-bas">
+
+      <section class="carte" aria-label="Tâches à réaliser">
+        <h2 class="carte-titre">Tâches à réaliser</h2>
+        <ul class="liste-taches">
+          <li class="tache" style="--couleur:#4FA3E8">
+            <span class="tache-nom">Relancer le client sur le devis</span>
+            <span class="tache-meta">Alpha Conseil · échéance 15 août</span>
+          </li>
+          <li class="tache" style="--couleur:#E8A14F">
+            <span class="tache-nom">Envoyer les factures de juillet</span>
+            <span class="tache-meta">Bâtir &amp; Co · échéance 18 août</span>
+          </li>
+          <li class="tache" style="--couleur:#C07CE8">
+            <span class="tache-nom">Préparer la réunion trimestrielle</span>
+            <span class="tache-meta">Novatech · échéance 22 août</span>
+          </li>
+          <li class="tache" style="--couleur:#4FA3E8">
+            <span class="tache-nom">Mettre à jour le contrat de maintenance</span>
+            <span class="tache-meta">Alpha Conseil · échéance 29 août</span>
+          </li>
+          <li class="tache" style="--couleur:#C07CE8">
+            <span class="tache-nom">Valider la maquette du site</span>
+            <span class="tache-meta">Novatech · échéance 5 septembre</span>
+          </li>
+          <li class="tache" style="--couleur:#E8A14F">
+            <span class="tache-nom">Commander les fournitures de chantier</span>
+            <span class="tache-meta">Bâtir &amp; Co · échéance 12 septembre</span>
+          </li>
+        </ul>
+      </section>
+
+      <section class="carte" aria-label="Tâches réalisées">
+        <h2 class="carte-titre">Tâches réalisées</h2>
+        <ul class="liste-taches liste-taches-faites">
+          <li class="tache tache-faite" style="--couleur:#E8A14F">
+            <span class="tache-nom">Signer le bon de commande</span>
+            <span class="tache-meta">Bâtir &amp; Co · réalisée le 8 août</span>
+          </li>
+          <li class="tache tache-faite" style="--couleur:#4FA3E8">
+            <span class="tache-nom">Répondre à l'appel d'offres</span>
+            <span class="tache-meta">Alpha Conseil · réalisée le 5 août</span>
+          </li>
+          <li class="tache tache-faite" style="--couleur:#C07CE8">
+            <span class="tache-nom">Archiver les dossiers 2025</span>
+            <span class="tache-meta">Novatech · réalisée le 1er août</span>
+          </li>
+        </ul>
+      </section>
+
+    </div>
+
   </main>
 
   <script src="js/app.js"></script>
