@@ -535,7 +535,10 @@ body {
   color: var(--texte-2nd);
 }
 
-.tache-faite { opacity: 0.55; }
+/* estompé, mais les boutons Restaurer/Supprimer restent bien lisibles */
+.tache-faite .tache-nom,
+.tache-faite .tache-meta,
+.tache-faite::before { opacity: 0.55; }
 
 .tache-faite .tache-nom { text-decoration: line-through; }
 
@@ -544,6 +547,55 @@ body {
   font-size: 0.9rem;
   color: var(--texte-2nd);
 }
+
+/* case « marquer comme réalisée », à droite de chaque tâche */
+.tache-case {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.tache:has(.tache-case) { padding-right: 46px; }
+
+/* boutons Restaurer / Supprimer sur la page Tâches réalisées */
+.tache-actions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  display: flex;
+  gap: 8px;
+}
+
+.tache:has(.tache-actions) { padding-right: 210px; }
+
+.btn-danger {
+  padding: 6px 12px;
+  border: 1px solid #6E2F35;
+  border-radius: 8px;
+  background: transparent;
+  color: #E88989;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: rgba(232, 137, 137, 0.1);
+  border-color: #9E4550;
+}
+
+.btn-danger:focus-visible {
+  outline: 2px solid #E88989;
+  outline-offset: 2px;
+}
+
+.dialogue-actions .btn-danger { margin-right: auto; padding: 10px 16px; font-size: 0.9rem; }
 
 /* ---- Pins du graphique -------------------------------------------------- */
 
@@ -781,5 +833,19 @@ body {
   .pin {
     width: 20px;
     height: 20px;
+  }
+
+  /* boutons Restaurer/Supprimer sous le texte plutôt que sur le côté */
+  .tache:has(.tache-actions) { padding-right: 12px; }
+
+  .tache-actions {
+    position: static;
+    translate: none;
+    margin-top: 8px;
+  }
+
+  .tache-case {
+    width: 22px;
+    height: 22px;
   }
 }

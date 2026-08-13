@@ -135,7 +135,8 @@ function afficherTaches() {
   const liste = $('#liste-taches');
   liste.innerHTML = '';
 
-  if (!TACHES.length) {
+  const aFaire = TACHES.filter((t) => !t.faite);
+  if (!aFaire.length) {
     const li = document.createElement('li');
     li.className = 'liste-vide';
     li.textContent = 'Aucune tâche pour l\'instant — clique sur « + Nouvelle tâche » pour commencer.';
@@ -143,7 +144,7 @@ function afficherTaches() {
     return;
   }
 
-  const ordonnees = [...TACHES].sort((a, b) => a.deadline.localeCompare(b.deadline));
+  const ordonnees = aFaire.sort((a, b) => a.deadline.localeCompare(b.deadline));
   for (const tache of ordonnees) {
     const societe = societeDe(tache);
     const li = document.createElement('li');
@@ -152,7 +153,8 @@ function afficherTaches() {
     li.style.setProperty('--couleur', societe ? societe.couleur : '');
     li.innerHTML = `
       <span class="tache-nom"></span>
-      <span class="tache-meta"></span>`;
+      <span class="tache-meta"></span>
+      <input class="tache-case" type="checkbox" title="Marquer comme réalisée">`;
     li.querySelector('.tache-nom').textContent = tache.nom;
     li.querySelector('.tache-meta').textContent =
       `${societe ? societe.nom : '?'} · échéance ${FORMAT_DATE.format(dateDeadline(tache))}`;
@@ -167,7 +169,7 @@ function afficherPins() {
   const cochees = societesCochees();
   zone.querySelectorAll('.pin').forEach((pin) => pin.remove());
   for (const tache of TACHES) {
-    if (!cochees.has(tache.societe)) continue;
+    if (tache.faite || !cochees.has(tache.societe)) continue;
     const societe = societeDe(tache);
     const jours = joursRestants(tache);
     const pin = document.createElement('button');
@@ -314,6 +316,19 @@ function brancherEvenements() {
     }
   });
 
+  // cocher une tâche : elle part dans « Tâches réalisées »
+  $('#liste-taches').addEventListener('change', (e) => {
+    const li = e.target.closest('.tache');
+    if (!li || !e.target.classList.contains('tache-case')) return;
+    const tache = TACHES.find((t) => t.id === li.dataset.id);
+    if (!tache) return;
+    tache.faite = true;
+    tache.realiseLe = new Date().toISOString().slice(0, 10);
+    sauverTaches();
+    afficherTaches();
+    afficherPins();
+  });
+
   // filtre par société
   $('#liste-societes').addEventListener('change', afficherPins);
   $('#btn-tout-cocher').addEventListener('click', () => cocherTout(true));
@@ -333,6 +348,7 @@ function brancherEvenements() {
   });
   $('#tache-annuler').addEventListener('click', () => $('#dialogue-tache').close());
   $('#formulaire-tache').addEventListener('submit', validerTache);
+  $('#tache-supprimer').addEventListener('click', supprimerTacheEnEdition);
   $('#tache-importance').addEventListener('input', (e) => {
     $('#tache-importance-valeur').textContent = e.target.value;
   });
@@ -374,6 +390,7 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
 
   $('#tache-dialogue-titre').textContent = tache ? 'Modifier la tâche' : 'Nouvelle tâche';
   $('#tache-valider').textContent = tache ? 'Enregistrer' : 'Ajouter';
+  $('#tache-supprimer').hidden = !tache;
 
   const importance = tache ? tache.importance : (importanceInitiale ?? 50);
   $('#tache-nom').value = tache ? tache.nom : '';
@@ -426,6 +443,18 @@ function validerTache(e) {
     TACHES.push({ id: crypto.randomUUID(), ...champs });
   }
 
+  tacheEnEdition = null;
+  sauverTaches();
+  afficherTaches();
+  afficherPins();
+  $('#dialogue-tache').close();
+}
+
+function supprimerTacheEnEdition() {
+  if (!tacheEnEdition) return;
+  if (!confirm('Supprimer définitivement cette tâche ?')) return;
+  const index = TACHES.findIndex((t) => t.id === tacheEnEdition);
+  if (index !== -1) TACHES.splice(index, 1);
   tacheEnEdition = null;
   sauverTaches();
   afficherTaches();

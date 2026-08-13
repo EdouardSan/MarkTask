@@ -143,7 +143,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 6 — Création de tâches
+## Bloc 6 — Création de tâches ✅
 
 **Avant.** Le bouton « + Nouvelle tâche » ne fait rien ; les tâches affichées sont factices.
 
@@ -202,7 +202,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 | 3 | Version mobile | Défilement vertical propre | ✅ |
 | 4 | Graphique interactif | Pins, survol, fiche, surbrillance | ✅ |
 | 5 | Sociétés | Ajout + couleurs, données conservées | ✅ |
-| 6 | Création de tâches | Formulaire complet fonctionnel |
+| 6 | Création de tâches | Formulaire complet fonctionnel | ✅ |
 | 7 | Terminer une tâche | Cycle de vie complet |
 | 8 | Firebase | Téléphone et ordinateur synchronisés |
 | 9 | Hors-ligne + PWA | App installable, marche sans réseau |
