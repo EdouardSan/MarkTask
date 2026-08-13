@@ -189,15 +189,26 @@ function terminerTache(tache) {
 }
 
 function celebrer() {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const fete = $('#celebration');
   const coche = fete.querySelector('.coche');
   const trait = fete.querySelector('.coche-trait');
   clearTimeout(celebrer.minuteur);
   fete.hidden = false;
 
+  // « Réduire les animations » (réglage d'accessibilité) : la coche s'affiche
+  // quand même, simplement sans mouvement
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    fete.style.opacity = '1';
+    celebrer.minuteur = setTimeout(() => {
+      fete.hidden = true;
+      fete.style.opacity = '';
+    }, 1200);
+    return;
+  }
+
   // animations pilotées par le code (Web Animations API) : chaque appel crée
   // des animations neuves — redémarrage garanti, sur Safari comme ailleurs
+  fete.style.opacity = '';
   for (const el of [fete, coche, trait]) {
     el.getAnimations().forEach((a) => a.cancel());
   }
