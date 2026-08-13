@@ -147,9 +147,11 @@ function afficherTaches() {
 function afficherPins() {
   const zone = $('#graphique-zone');
   const cochees = societesCochees();
-  // les pins vont être redessinés : la fiche ne doit pas rester orpheline
-  ficheEpinglee = null;
-  cacherFiche();
+
+  // une fiche est-elle ouverte ? on la préservera à travers le redessin
+  const ficheOuvertePour = $('#fiche').hidden ? null : ficheTacheId;
+  const etaitEpinglee = Boolean(ficheEpinglee);
+
   zone.querySelectorAll('.pin').forEach((pin) => pin.remove());
   for (const tache of TACHES) {
     if (tache.faite || !cochees.has(tache.societe)) continue;
@@ -164,6 +166,18 @@ function afficherPins() {
     pin.style.bottom = Math.min(97, Math.max(3, tache.importance)) + '%';
     pin.setAttribute('aria-label', tache.nom);
     zone.appendChild(pin);
+  }
+
+  // raccrocher la fiche au pin recréé — ou la fermer si la tâche a disparu
+  if (ficheOuvertePour) {
+    const pin = zone.querySelector(`.pin[data-id="${ficheOuvertePour}"]`);
+    if (pin) {
+      ficheEpinglee = etaitEpinglee ? pin : null;
+      montrerFiche(pin);
+    } else {
+      ficheEpinglee = null;
+      cacherFiche();
+    }
   }
 }
 
