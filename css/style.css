@@ -32,11 +32,102 @@ body {
 /* ---- En-tête ----------------------------------------------------------- */
 
 .app-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   padding: 14px var(--marge);
+}
+
+/* ---- Menu ☰ en haut à gauche ------------------------------------------- */
+
+.menu {
+  position: absolute;
+  left: var(--marge);
+  top: 50%;
+  translate: 0 -50%;
+  z-index: 20;              /* le panneau déplié passe au-dessus du dashboard */
+}
+
+.menu-bouton {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 0 9px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 10px;
+  background: var(--carte);
+  cursor: pointer;
+  list-style: none;
+}
+
+.menu-bouton::-webkit-details-marker { display: none; }
+
+.menu-bouton:hover { border-color: var(--texte-2nd); }
+
+.menu-bouton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.menu-barre {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--texte);
+}
+
+.menu-panneau {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  padding: 6px;
+  border: 1px solid var(--carte-bord);
+  border-radius: var(--rayon);
+  background: var(--carte);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  z-index: 10;
+}
+
+.menu-lien {
+  display: block;
+  padding: 11px 14px;
+  border-radius: 9px;
+  color: var(--texte);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.menu-lien:hover { background: #16181C; }
+
+/* ---- Bouton retour (pages secondaires) --------------------------------- */
+
+.btn-retour {
+  position: absolute;
+  left: var(--marge);
+  top: 50%;
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 10px;
+  background: var(--carte);
+  color: var(--texte);
+  font-size: 1.3rem;
+  text-decoration: none;
+}
+
+.btn-retour:hover { border-color: var(--texte-2nd); }
+
+.btn-retour:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .app-logo {
@@ -74,10 +165,25 @@ body {
 }
 
 .rangee-bas {
-  flex: none;                       /* repliées par défaut, juste deux titres */
-  grid-template-columns: 1fr 1fr;
+  flex: none;                       /* repliée par défaut, juste le titre */
+  grid-template-columns: 1fr;
   align-items: start;
 }
+
+/* ---- Page « Tâches réalisées » ----------------------------------------- */
+
+.page-liste {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--marge) var(--marge);
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.page-liste .carte { flex: 1; }
 
 /* ---- Cartes ------------------------------------------------------------ */
 
@@ -250,6 +356,34 @@ body {
 
 /* ---- Sociétés ---------------------------------------------------------- */
 
+.societes-filtres {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-filtre {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texte-2nd);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.btn-filtre:hover {
+  color: var(--texte);
+  border-color: var(--texte-2nd);
+}
+
+.btn-filtre:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .liste-societes {
   list-style: none;
   overflow-y: auto;
@@ -257,15 +391,27 @@ body {
 }
 
 .societe {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 2px;
   border-bottom: 1px solid #16181C;
   font-size: 0.95rem;
 }
 
 .societe:last-child { border-bottom: none; }
+
+.societe-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 2px;
+  cursor: pointer;
+}
+
+.societe-case {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
 
 .pastille {
   width: 12px;

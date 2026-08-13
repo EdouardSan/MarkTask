@@ -36,30 +36,38 @@ L'**importance**, elle, est choisie à la création de la tâche (curseur simple
 
 ## Agencement desktop (schéma `design/schema-dashboard-main.jpeg`, révisé le 13/08/2026)
 
-Révisions demandées après la maquette : le bouton « Nouvelle tâche » est intégré
-**dans le coin haut-droit du graphique**, et les deux listes de tâches sont
-**repliées par défaut** (un clic sur la flèche les déplie). Le graphique occupe
-ainsi presque tout l'écran — il doit rester lisible avec des dizaines,
-voire une centaine de pins.
+Révisions demandées après la maquette :
+
+- Le bouton « Nouvelle tâche » est intégré **dans le coin haut-droit du graphique**.
+- La liste « Tâches à réaliser » est **repliée par défaut** (un clic sur la flèche
+  la déplie) et occupe toute la largeur — on y voit l'entièreté de chaque tâche.
+- « Tâches réalisées » n'est **plus sur le dashboard** : un menu ☰ en haut à
+  gauche ouvre une **page dédiée** avec cette liste.
+- Le panneau Sociétés sert aussi de **filtre du graphique** : chaque société a une
+  case à cocher (cochée = ses tâches visibles sur le graphique, décochée =
+  masquées), plus deux boutons « Tout cocher » / « Tout décocher ».
+- Le graphique occupe ainsi presque tout l'écran — il doit rester lisible avec
+  des dizaines, voire une centaine de pins.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                        MARKTASK                          │
+│  ☰                     MARKTASK                          │
 ├───────────────────────────────────────────┬──────────────┤
 │  GRAPHIQUE          [+ Nouvelle tâche]    │  SOCIÉTÉS    │
-│  importance ↑ / urgence →                 │  ● Société 1 │
-│  (pins colorés par société,               │  ● Société 2 │
-│   survol = fiche de la tâche,             │              │
-│   très grand : des dizaines de pins)      │  [+ Nouvelle │
+│  importance ↑ / urgence →                 │ [Tout cocher]│
+│  (pins colorés par société,               │[Tout décoch.]│
+│   survol = fiche de la tâche,             │ ☑ ● Société 1│
+│   très grand : des dizaines de pins)      │ ☑ ● Société 2│
+│                                           │  [+ Nouvelle │
 │                                           │    société]  │
-├─────────────────────────┬─────────────────┴──────────────┤
-│  ▸ TÂCHES À RÉALISER    │  ▸ TÂCHES RÉALISÉES            │
-│  (repliées par défaut,  │  (repliées par défaut)         │
-│   clic pour déplier)    │                                │
-└─────────────────────────┴────────────────────────────────┘
+├───────────────────────────────────────────┴──────────────┤
+│  ▸ TÂCHES À RÉALISER (repliée par défaut, pleine largeur)│
+└──────────────────────────────────────────────────────────┘
+
+Menu ☰ → page « Tâches réalisées » (avec bouton ← retour au dashboard)
 ```
 
-Mobile (défilement vertical) : logo → graphique (avec son bouton Nouvelle tâche) → sociétés → tâches à réaliser → tâches réalisées.
+Mobile (défilement vertical) : logo (menu ☰ conservé) → graphique (avec son bouton Nouvelle tâche) → sociétés → tâches à réaliser.
 
 ---
 
@@ -104,9 +112,9 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 **Avant.** Le cadre du graphique est vide, les fausses tâches ne vivent que dans la liste.
 
-**Ce que le bloc réalise.** Les fausses tâches apparaissent en pins colorés positionnés selon urgence (calculée depuis la deadline) et importance. Au survol d'un pin : une fiche s'affiche avec tout le contenu de la tâche (nom, descriptif, deadline, société), et la ligne correspondante s'illumine dans la liste Tâches à réaliser. Sur téléphone, un appui sur le pin fait la même chose.
+**Ce que le bloc réalise.** Les fausses tâches apparaissent en pins colorés positionnés selon urgence (calculée depuis la deadline) et importance. Au survol d'un pin : une fiche s'affiche avec tout le contenu de la tâche (nom, descriptif, deadline, société), et la ligne correspondante s'illumine dans la liste Tâches à réaliser. Sur téléphone, un appui sur le pin fait la même chose. Le **filtre par société** devient actif : décocher une société masque instantanément ses pins, la recocher les fait réapparaître ; « Tout cocher » / « Tout décocher » agissent sur toutes les sociétés d'un coup.
 
-**Test en 2 minutes.** Ouvrir la page, passer la souris sur un pin : la fiche apparaît à côté du pin et la bonne ligne se met en surbrillance dans la liste. Vérifier qu'une tâche à deadline proche est plus à droite qu'une tâche à deadline lointaine.
+**Test en 2 minutes.** Ouvrir la page, passer la souris sur un pin : la fiche apparaît à côté du pin et la bonne ligne se met en surbrillance dans la liste. Vérifier qu'une tâche à deadline proche est plus à droite qu'une tâche à deadline lointaine. Décocher une société : ses pins disparaissent ; « Tout cocher » : tout revient.
 
 ---
 
@@ -134,9 +142,9 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 **Avant.** Les tâches créées restent « à réaliser » pour toujours.
 
-**Ce que le bloc réalise.** Une case à cocher sur chaque tâche : cochée, la tâche quitte la liste et le graphique et rejoint « Tâches réalisées » (avec sa date de réalisation). Possibilité de la restaurer ou de la supprimer définitivement. Modification et suppression d'une tâche à réaliser également.
+**Ce que le bloc réalise.** Une case à cocher sur chaque tâche : cochée, la tâche quitte la liste et le graphique et rejoint la page « Tâches réalisées » (menu ☰), avec sa date de réalisation. Possibilité de la restaurer ou de la supprimer définitivement depuis cette page. Modification et suppression d'une tâche à réaliser également.
 
-**Test en 2 minutes.** Cocher une tâche : elle disparaît du graphique et apparaît dans Tâches réalisées. La décocher : elle revient. Supprimer : elle disparaît pour de bon, même après rechargement.
+**Test en 2 minutes.** Cocher une tâche : elle disparaît du graphique ; ouvrir le menu ☰ → Tâches réalisées : elle y est. La restaurer : elle revient sur le dashboard. Supprimer : elle disparaît pour de bon, même après rechargement.
 
 ---
 
