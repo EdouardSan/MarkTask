@@ -173,7 +173,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 9 — Mode hors-ligne et PWA
+## Bloc 9 — Mode hors-ligne et PWA ✅
 
 **Avant.** L'app exige une connexion à chaque ouverture.
 
@@ -205,5 +205,5 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 | 6 | Création de tâches | Formulaire complet fonctionnel | ✅ |
 | 7 | Terminer une tâche | Cycle de vie complet | ✅ |
 | 8 | Firebase | Téléphone et ordinateur synchronisés | ✅ |
-| 9 | Hors-ligne + PWA | App installable, marche sans réseau |
+| 9 | Hors-ligne + PWA | App installable, marche sans réseau | ✅ |
 | 10 | Mise en ligne | Lien à donner à l'utilisateur |
