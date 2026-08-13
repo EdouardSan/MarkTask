@@ -20,7 +20,7 @@
       </summary>
       <nav class="menu-panneau">
         <a class="menu-lien" href="taches-realisees.html">Tâches réalisées</a>
-        <span class="menu-version">version 26</span>
+        <span class="menu-version">version 27</span>
       </nav>
     </details>
     <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
@@ -172,7 +172,7 @@
   <script src="js/stockage.js"></script>
   <script src="js/app.js"></script>
   <script>
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   </script>
 </body>
 </html>

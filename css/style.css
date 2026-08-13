@@ -533,10 +533,32 @@ body {
   background: var(--couleur, var(--texte-2nd));
 }
 
+#liste-taches .tache { cursor: pointer; }   /* un clic déplie / replie */
+
 .tache-nom {
   display: block;
   font-size: 0.95rem;
   font-weight: 600;
+}
+
+/* contenu complet d'une tâche dépliée */
+.tache-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #2A303A;
+}
+
+.tache-detail-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tache-detail-ligne {
+  font-size: 0.8rem;
+  color: var(--texte-2nd);
 }
 
 .tache-meta {
