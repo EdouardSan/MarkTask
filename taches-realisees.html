@@ -4,7 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tâches réalisées — MarkTask</title>
+  <meta name="theme-color" content="#07070A">
   <link rel="icon" type="image/png" href="assets/logo-512.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/logo-192.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,5 +31,8 @@
   <script src="js/firebase-config.js"></script>
   <script src="js/stockage.js"></script>
   <script src="js/realisees.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+  </script>
 </body>
 </html>
