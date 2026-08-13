@@ -263,24 +263,29 @@ function montrerFiche(pin) {
   // sur desktop elle reste transparente à la souris pour ne pas gêner le survol
   fiche.style.pointerEvents = MOBILE.matches ? 'auto' : 'none';
 
-  // à droite du pin, ou à gauche si on est trop près du bord droit
+  // position en pixels, avec rabattement : à droite du pin si la place existe,
+  // sinon à gauche — et toujours ramenée entière dans le cadre du graphique
   const zone = $('#graphique-zone');
-  const x = parseFloat(pin.style.left);
-  const y = parseFloat(pin.style.bottom);
-  if (x > 55) {
-    fiche.style.left = 'auto';
-    fiche.style.right = (100 - x) + '%';
-  } else {
-    fiche.style.right = 'auto';
-    fiche.style.left = `calc(${x}% + 18px)`;
-  }
-  if (y > 55) {
-    fiche.style.bottom = 'auto';
-    fiche.style.top = (100 - y) + '%';
-  } else {
-    fiche.style.top = 'auto';
-    fiche.style.bottom = `calc(${y}% + 14px)`;
-  }
+  const largeurZone = zone.clientWidth;
+  const hauteurZone = zone.clientHeight;
+  const pinX = (parseFloat(pin.style.left) / 100) * largeurZone;
+  const pinY = (parseFloat(pin.style.bottom) / 100) * hauteurZone;
+  const marge = 6;
+  const largeurFiche = fiche.offsetWidth;
+  const hauteurFiche = fiche.offsetHeight;
+
+  let gauche = pinX + 18;
+  if (gauche + largeurFiche > largeurZone - marge) gauche = pinX - largeurFiche - 18;
+  gauche = Math.max(marge, Math.min(gauche, largeurZone - largeurFiche - marge));
+
+  let bas = pinY + 14;
+  if (bas + hauteurFiche > hauteurZone - marge) bas = pinY - hauteurFiche - 14;
+  bas = Math.max(marge, Math.min(bas, hauteurZone - hauteurFiche - marge));
+
+  fiche.style.right = 'auto';
+  fiche.style.top = 'auto';
+  fiche.style.left = gauche + 'px';
+  fiche.style.bottom = bas + 'px';
 
   surligner(tache.id, true);
 }
