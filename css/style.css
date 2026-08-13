@@ -286,8 +286,9 @@ body {
   padding: 68px 18px 14px;
 }
 
-/* le bouton Nouvelle tâche vit dans le coin haut-droit du graphique */
-.carte-graphique .btn-principal {
+/* le bouton Nouvelle tâche vit dans le coin haut-droit du graphique
+   (enfant direct seulement : ne pas attraper le bouton de la fiche) */
+.carte-graphique > .btn-principal {
   position: absolute;
   top: 14px;
   right: 14px;
@@ -633,20 +634,25 @@ body {
 /* pendant le placement, les pins laissent passer le clic */
 .graphique-zone.placement .pin { pointer-events: none; }
 
+/* bandeau flottant en bas de l'écran : ne recouvre pas le graphique
+   et laisse passer les appuis */
 .placement-aide {
-  position: absolute;
-  top: 16px;
+  position: fixed;
+  bottom: 18px;
   left: 50%;
   translate: -50% 0;
-  z-index: 2;
-  max-width: 70%;
-  padding: 8px 14px;
+  z-index: 70;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 10px 18px;
   border: 1px solid var(--accent-fonce);
-  border-radius: 999px;
+  border-radius: 14px;
   background: var(--carte);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
   font-size: 0.85rem;
-  color: var(--texte-2nd);
+  color: var(--texte);
   text-align: center;
+  pointer-events: none;
 }
 
 /* ---- Fiche de la tâche (survol / appui sur un pin) ---------------------- */
@@ -682,6 +688,15 @@ body {
   margin: 7px 0;
   font-size: 0.85rem;
   line-height: 1.45;
+}
+
+/* bouton Terminer de la fiche : mobile uniquement (desktop = double-clic) */
+.fiche-terminer {
+  display: none;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
 }
 
 /* ---- Surbrillance de la tâche correspondante dans la liste -------------- */
@@ -887,15 +902,10 @@ body {
     height: 20px;
   }
 
-  /* la bulle d'aide du mode visée passe sous le bouton, en pleine largeur */
-  .placement-aide {
-    top: 60px;
-    left: 12px;
-    right: 12px;
-    translate: 0 0;
-    max-width: none;
-    border-radius: 12px;
-  }
+  /* sur mobile, la fiche épinglée devient interactive : bouton Terminer */
+  .fiche { pointer-events: auto; }
+
+  .fiche-terminer { display: block; }
 
   /* boutons Restaurer/Supprimer sous le texte plutôt que sur le côté */
   .tache:has(.tache-actions) { padding-right: 12px; }

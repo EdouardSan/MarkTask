@@ -215,9 +215,12 @@ function remplirFiche(tache) {
     `Urgence ${niveauUrgence(jours).toLowerCase()} · importance ${tache.importance}/100`;
 }
 
+let ficheTacheId = null;    // tâche actuellement affichée dans la fiche
+
 function montrerFiche(pin) {
   const tache = TACHES.find((t) => t.id === pin.dataset.id);
   if (!tache) return;
+  ficheTacheId = tache.id;
   remplirFiche(tache);
 
   const fiche = $('#fiche');
@@ -356,12 +359,23 @@ function brancherEvenements() {
     if (e.key === 'Escape' && modePlacement) quitterPlacement();
   });
 
-  // un appui ailleurs referme la fiche épinglée
+  // un appui ailleurs referme la fiche épinglée (mais pas un appui sur la fiche)
   document.addEventListener('click', (e) => {
-    if (ficheEpinglee && !e.target.closest('.pin')) {
+    if (ficheEpinglee && !e.target.closest('.pin') && !e.target.closest('.fiche')) {
       ficheEpinglee = null;
       cacherFiche();
     }
+  });
+
+  // bouton Terminer de la fiche (mobile) : demande confirmation
+  $('#fiche-terminer').addEventListener('click', () => {
+    const tache = TACHES.find((t) => t.id === ficheTacheId);
+    if (!tache) return;
+    ficheEpinglee = null;
+    cacherFiche();
+    tacheATerminer = tache.id;
+    $('#terminer-question').textContent = `Terminer la tâche « ${tache.nom} » ?`;
+    $('#dialogue-terminer').showModal();
   });
 
   // cocher une tâche : elle part dans « Tâches réalisées »
