@@ -225,6 +225,9 @@ function montrerFiche(pin) {
 
   const fiche = $('#fiche');
   fiche.hidden = false;
+  // sur mobile la fiche doit recevoir les appuis (bouton Terminer) ;
+  // sur desktop elle reste transparente à la souris pour ne pas gêner le survol
+  fiche.style.pointerEvents = MOBILE.matches ? 'auto' : 'none';
 
   // à droite du pin, ou à gauche si on est trop près du bord droit
   const zone = $('#graphique-zone');
@@ -251,6 +254,17 @@ function montrerFiche(pin) {
 function cacherFiche() {
   $('#fiche').hidden = true;
   surligner(null, false);
+}
+
+function proposerTerminerDepuisFiche() {
+  const tache = TACHES.find((t) => t.id === ficheTacheId);
+  if (!tache) return;
+  ficheEpinglee = null;
+  cacherFiche();
+  tacheATerminer = tache.id;
+  $('#terminer-question').textContent = `Terminer la tâche « ${tache.nom} » ?`;
+  const dialogue = $('#dialogue-terminer');
+  if (!dialogue.open) dialogue.showModal();
 }
 
 function surligner(id, actif) {
@@ -367,15 +381,13 @@ function brancherEvenements() {
     }
   });
 
-  // bouton Terminer de la fiche (mobile) : demande confirmation
-  $('#fiche-terminer').addEventListener('click', () => {
-    const tache = TACHES.find((t) => t.id === ficheTacheId);
-    if (!tache) return;
-    ficheEpinglee = null;
-    cacherFiche();
-    tacheATerminer = tache.id;
-    $('#terminer-question').textContent = `Terminer la tâche « ${tache.nom} » ?`;
-    $('#dialogue-terminer').showModal();
+  // bouton Terminer de la fiche (mobile) : demande confirmation.
+  // Double branchement clic + toucher : certains navigateurs mobiles ne
+  // transforment pas un appui sur un élément apparu dynamiquement en clic.
+  $('#fiche-terminer').addEventListener('click', proposerTerminerDepuisFiche);
+  $('#fiche-terminer').addEventListener('touchend', (e) => {
+    e.preventDefault();
+    proposerTerminerDepuisFiche();
   });
 
   // cocher une tâche : elle part dans « Tâches réalisées »
