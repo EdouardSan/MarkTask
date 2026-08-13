@@ -36,7 +36,15 @@ Le pin change donc de zone tout seul, jour après jour, à mesure que l'échéan
 approche. L'axe des abscisses est découpé en 4 zones correspondant à ces niveaux
 (le quadrillage du graphique reprend ce découpage).
 
-L'**importance**, elle, est choisie à la création de la tâche (curseur simple).
+L'**importance**, elle, est choisie à la création de la tâche (révisé le 13/08/2026) :
+
+- **Desktop** : cliquer sur « + Nouvelle tâche » passe le graphique en mode visée
+  (curseur en croix) ; on clique sur le graphe à la hauteur voulue, et l'ordonnée
+  du clic donne l'importance (ajustable ensuite dans le formulaire). Échap annule.
+- **Mobile** : le formulaire s'ouvre directement, avec un curseur d'importance.
+
+**Cliquer sur un pin du graphique ouvre la modification de la tâche**
+(sur mobile : premier appui = fiche, second appui sur le même pin = modification).
 
 ## Agencement desktop (schéma `design/schema-dashboard-main.jpeg`, révisé le 13/08/2026)
 

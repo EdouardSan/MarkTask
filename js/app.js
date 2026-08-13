@@ -182,9 +182,15 @@ function afficherPins() {
   }
 }
 
-// ---- Fiche de survol -----------------------------------------------------
+// ---- États d'interaction -------------------------------------------------
 
-let ficheEpinglee = null;   // pin « épinglé » par un appui/clic (mobile)
+const MOBILE = window.matchMedia('(max-width: 820px)');
+
+let ficheEpinglee = null;   // pin « épinglé » par un appui (mobile)
+let modePlacement = false;  // desktop : en attente d'un clic sur le graphe
+let tacheEnEdition = null;  // id de la tâche en cours de modification
+
+// ---- Fiche de survol -----------------------------------------------------
 
 function remplirFiche(tache) {
   const societe = societeDe(tache);
@@ -262,16 +268,42 @@ function brancherEvenements() {
     const pin = e.target.closest('.pin');
     if (pin) montrerFiche(pin);
   });
+
   zone.addEventListener('click', (e) => {
+    // mode placement (desktop) : le clic fixe l'importance de la nouvelle tâche
+    if (modePlacement) {
+      const rect = zone.getBoundingClientRect();
+      const importance = Math.round((1 - (e.clientY - rect.top) / rect.height) * 100);
+      quitterPlacement();
+      ouvrirDialogueTache(null, Math.max(0, Math.min(100, importance)));
+      return;
+    }
+
     const pin = e.target.closest('.pin');
     if (!pin) return;
+    const tache = TACHES.find((t) => t.id === pin.dataset.id);
+
+    if (!MOBILE.matches) {
+      // desktop : un clic sur un pin ouvre la modification
+      cacherFiche();
+      ouvrirDialogueTache(tache);
+      return;
+    }
+
+    // mobile : premier appui = fiche, second appui sur le même pin = modification
     if (ficheEpinglee === pin) {
       ficheEpinglee = null;
       cacherFiche();
+      ouvrirDialogueTache(tache);
     } else {
       ficheEpinglee = pin;
       montrerFiche(pin);
     }
+  });
+
+  // Échap annule le mode placement
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modePlacement) quitterPlacement();
   });
 
   // un appui ailleurs referme la fiche épinglée
@@ -292,18 +324,41 @@ function brancherEvenements() {
   $('#societe-annuler').addEventListener('click', () => $('#dialogue-societe').close());
   $('#formulaire-societe').addEventListener('submit', validerNouvelleSociete);
 
-  // ajout d'une tâche
-  $('#btn-nouvelle-tache').addEventListener('click', ouvrirDialogueTache);
+  // ajout d'une tâche : sur desktop, on vise d'abord le graphe ;
+  // sur mobile, le formulaire s'ouvre directement (curseur d'importance)
+  $('#btn-nouvelle-tache').addEventListener('click', () => {
+    if (modePlacement) { quitterPlacement(); return; }
+    if (MOBILE.matches) ouvrirDialogueTache(null);
+    else entrerPlacement();
+  });
   $('#tache-annuler').addEventListener('click', () => $('#dialogue-tache').close());
-  $('#formulaire-tache').addEventListener('submit', validerNouvelleTache);
+  $('#formulaire-tache').addEventListener('submit', validerTache);
   $('#tache-importance').addEventListener('input', (e) => {
     $('#tache-importance-valeur').textContent = e.target.value;
   });
 }
 
-// ---- Ajout d'une tâche ---------------------------------------------------
+// ---- Mode placement (desktop) --------------------------------------------
 
-function ouvrirDialogueTache() {
+function entrerPlacement() {
+  modePlacement = true;
+  $('#graphique-zone').classList.add('placement');
+  $('#placement-aide').hidden = false;
+  cacherFiche();
+}
+
+function quitterPlacement() {
+  modePlacement = false;
+  $('#graphique-zone').classList.remove('placement');
+  $('#placement-aide').hidden = true;
+}
+
+// ---- Création et modification d'une tâche --------------------------------
+
+// tache = null → création (importanceInitiale : valeur issue du clic sur le graphe)
+// tache fournie → modification
+function ouvrirDialogueTache(tache, importanceInitiale) {
+  tacheEnEdition = tache ? tache.id : null;
   const erreur = $('#tache-erreur');
   erreur.hidden = true;
 
@@ -317,12 +372,18 @@ function ouvrirDialogueTache() {
     select.appendChild(option);
   }
 
-  $('#tache-nom').value = '';
-  $('#tache-desc').value = '';
-  $('#tache-deadline').value = '';
-  $('#tache-deadline').min = AUJOURDHUI.toISOString().slice(0, 10);
-  $('#tache-importance').value = 50;
-  $('#tache-importance-valeur').textContent = '50';
+  $('#tache-dialogue-titre').textContent = tache ? 'Modifier la tâche' : 'Nouvelle tâche';
+  $('#tache-valider').textContent = tache ? 'Enregistrer' : 'Ajouter';
+
+  const importance = tache ? tache.importance : (importanceInitiale ?? 50);
+  $('#tache-nom').value = tache ? tache.nom : '';
+  $('#tache-desc').value = tache ? tache.descriptif : '';
+  $('#tache-deadline').value = tache ? tache.deadline : '';
+  // en création, pas de deadline passée ; en modification, on ne bloque pas l'existante
+  $('#tache-deadline').min = tache ? '' : AUJOURDHUI.toISOString().slice(0, 10);
+  if (tache) select.value = tache.societe;
+  $('#tache-importance').value = importance;
+  $('#tache-importance-valeur').textContent = importance;
   $('#dialogue-tache').showModal();
 
   if (!SOCIETES.length) {
@@ -331,7 +392,7 @@ function ouvrirDialogueTache() {
   }
 }
 
-function validerNouvelleTache(e) {
+function validerTache(e) {
   e.preventDefault();
   const erreur = $('#tache-erreur');
   const nom = $('#tache-nom').value.trim();
@@ -350,14 +411,22 @@ function validerNouvelleTache(e) {
     return;
   }
 
-  TACHES.push({
-    id: crypto.randomUUID(),
+  const champs = {
     nom,
     descriptif: $('#tache-desc').value.trim(),
     deadline,
     societe,
     importance: Number($('#tache-importance').value),
-  });
+  };
+
+  if (tacheEnEdition) {
+    const tache = TACHES.find((t) => t.id === tacheEnEdition);
+    Object.assign(tache, champs);
+  } else {
+    TACHES.push({ id: crypto.randomUUID(), ...champs });
+  }
+
+  tacheEnEdition = null;
   sauverTaches();
   afficherTaches();
   afficherPins();

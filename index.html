@@ -30,6 +30,9 @@
 
       <section class="carte carte-graphique" aria-label="Graphique urgence importance">
         <button class="btn-principal" type="button" id="btn-nouvelle-tache">+ Nouvelle tâche</button>
+        <p class="placement-aide" id="placement-aide" hidden>
+          Clique sur le graphique à la hauteur de l'importance souhaitée — Échap pour annuler
+        </p>
         <div class="graphique">
           <span class="axe-label axe-y">Importance</span>
           <div class="graphique-zone" id="graphique-zone">
@@ -88,7 +91,7 @@
 
   <dialog class="dialogue" id="dialogue-tache">
     <form id="formulaire-tache" novalidate>
-      <h2 class="dialogue-titre">Nouvelle tâche</h2>
+      <h2 class="dialogue-titre" id="tache-dialogue-titre">Nouvelle tâche</h2>
       <label class="champ">
         Nom de la tâche
         <input type="text" id="tache-nom" maxlength="80" autocomplete="off">
@@ -106,13 +109,13 @@
         <select id="tache-societe"></select>
       </label>
       <label class="champ">
-        Importance : <output id="tache-importance-valeur">50</output>/100
+        <span>Importance : <output id="tache-importance-valeur">50</output>/100</span>
         <input type="range" id="tache-importance" min="0" max="100" value="50">
       </label>
       <p class="dialogue-erreur" id="tache-erreur" hidden></p>
       <div class="dialogue-actions">
         <button class="btn-filtre" type="button" id="tache-annuler">Annuler</button>
-        <button class="btn-principal" type="submit">Ajouter</button>
+        <button class="btn-principal" type="submit" id="tache-valider">Ajouter</button>
       </div>
     </form>
   </dialog>
