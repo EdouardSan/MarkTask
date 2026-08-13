@@ -34,26 +34,32 @@ approche. L'axe des abscisses est découpé en 4 zones correspondant à ces nive
 
 L'**importance**, elle, est choisie à la création de la tâche (curseur simple).
 
-## Agencement desktop (d'après le schéma à la main : `design/schema-dashboard-main.jpeg`)
+## Agencement desktop (schéma `design/schema-dashboard-main.jpeg`, révisé le 13/08/2026)
+
+Révisions demandées après la maquette : le bouton « Nouvelle tâche » est intégré
+**dans le coin haut-droit du graphique**, et les deux listes de tâches sont
+**repliées par défaut** (un clic sur la flèche les déplie). Le graphique occupe
+ainsi presque tout l'écran — il doit rester lisible avec des dizaines,
+voire une centaine de pins.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                        MARKTASK                          │
-├──────────────────────────────┬───────────┬───────────────┤
-│                              │           │  SOCIÉTÉS     │
-│  GRAPHIQUE                   │ [Nouvelle │  ● Société 1  │
-│  importance ↑ / urgence →    │  tâche]   │  ● Société 2  │
-│  (pins colorés par société,  │           │               │
-│   survol = fiche de la tâche)│           │  [+ Nouvelle  │
-│                              │           │    société]   │
-├──────────────────────────────┴─┬─────────┴───────────────┤
-│  TÂCHES À RÉALISER             │  TÂCHES RÉALISÉES       │
-│  (surbrillance au survol       │                         │
-│   d'un pin du graphique)       │                         │
-└────────────────────────────────┴─────────────────────────┘
+├───────────────────────────────────────────┬──────────────┤
+│  GRAPHIQUE          [+ Nouvelle tâche]    │  SOCIÉTÉS    │
+│  importance ↑ / urgence →                 │  ● Société 1 │
+│  (pins colorés par société,               │  ● Société 2 │
+│   survol = fiche de la tâche,             │              │
+│   très grand : des dizaines de pins)      │  [+ Nouvelle │
+│                                           │    société]  │
+├─────────────────────────┬─────────────────┴──────────────┤
+│  ▸ TÂCHES À RÉALISER    │  ▸ TÂCHES RÉALISÉES            │
+│  (repliées par défaut,  │  (repliées par défaut)         │
+│   clic pour déplier)    │                                │
+└─────────────────────────┴────────────────────────────────┘
 ```
 
-Mobile (défilement vertical) : logo → bouton Nouvelle tâche → graphique → sociétés → tâches à réaliser → tâches réalisées.
+Mobile (défilement vertical) : logo → graphique (avec son bouton Nouvelle tâche) → sociétés → tâches à réaliser → tâches réalisées.
 
 ---
 
@@ -64,7 +70,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 1 — Squelette du projet
+## Bloc 1 — Squelette du projet ✅
 
 **Avant.** Le repo ne contient que le logo, les références design et ce plan.
 
@@ -74,7 +80,7 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ---
 
-## Bloc 2 — Maquette du dashboard avec fausses données
+## Bloc 2 — Maquette du dashboard avec fausses données ✅
 
 **Avant.** Une page sombre quasi vide avec l'en-tête.
 
@@ -166,10 +172,10 @@ Chaque bloc = une petite étape livrable. Trois rubriques à chaque fois :
 
 ## Récapitulatif
 
-| # | Bloc | Livrable visible |
-|---|------|------------------|
-| 1 | Squelette | Page sombre avec logo |
-| 2 | Maquette dashboard | Tout l'écran desktop, données factices |
+| # | Bloc | Livrable visible | Fait |
+|---|------|------------------|------|
+| 1 | Squelette | Page sombre avec logo | ✅ |
+| 2 | Maquette dashboard | Tout l'écran desktop, données factices | ✅ |
 | 3 | Version mobile | Défilement vertical propre |
 | 4 | Graphique interactif | Pins, survol, fiche, surbrillance |
 | 5 | Sociétés | Ajout + couleurs, données conservées |

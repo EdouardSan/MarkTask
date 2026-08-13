@@ -15,10 +15,11 @@
 
   <main class="dashboard">
 
-    <!-- Rangée haute : graphique / bouton Nouvelle tâche / sociétés -->
+    <!-- Rangée haute : graphique (avec bouton Nouvelle tâche) / sociétés -->
     <div class="rangee rangee-haut">
 
       <section class="carte carte-graphique" aria-label="Graphique urgence importance">
+        <button class="btn-principal" type="button">+ Nouvelle tâche</button>
         <div class="graphique">
           <span class="axe-label axe-y">Importance</span>
           <div class="graphique-zone">
@@ -27,10 +28,6 @@
           <span class="axe-label axe-x">Urgence</span>
         </div>
       </section>
-
-      <div class="colonne-action">
-        <button class="btn-principal" type="button">+ Nouvelle tâche</button>
-      </div>
 
       <section class="carte carte-societes" aria-label="Sociétés">
         <h2 class="carte-titre">Sociétés</h2>
@@ -47,8 +44,10 @@
     <!-- Rangée basse : tâches à réaliser / tâches réalisées -->
     <div class="rangee rangee-bas">
 
-      <section class="carte" aria-label="Tâches à réaliser">
-        <h2 class="carte-titre">Tâches à réaliser</h2>
+      <details class="carte carte-repliable">
+        <summary class="carte-titre-repliable">
+          <span class="chevron" aria-hidden="true"></span>Tâches à réaliser
+        </summary>
         <ul class="liste-taches">
           <li class="tache" style="--couleur:#4FA3E8">
             <span class="tache-nom">Relancer le client sur le devis</span>
@@ -75,10 +74,12 @@
             <span class="tache-meta">Bâtir &amp; Co · échéance 12 septembre</span>
           </li>
         </ul>
-      </section>
+      </details>
 
-      <section class="carte" aria-label="Tâches réalisées">
-        <h2 class="carte-titre">Tâches réalisées</h2>
+      <details class="carte carte-repliable">
+        <summary class="carte-titre-repliable">
+          <span class="chevron" aria-hidden="true"></span>Tâches réalisées
+        </summary>
         <ul class="liste-taches liste-taches-faites">
           <li class="tache tache-faite" style="--couleur:#E8A14F">
             <span class="tache-nom">Signer le bon de commande</span>
@@ -93,7 +94,7 @@
             <span class="tache-meta">Novatech · réalisée le 1er août</span>
           </li>
         </ul>
-      </section>
+      </details>
 
     </div>
 
