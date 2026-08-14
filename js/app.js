@@ -567,6 +567,14 @@ function brancherEvenements() {
   // le clic/appui sur le graphe fixe l'importance
   $('#btn-nouvelle-tache').addEventListener('click', () => {
     if (modePlacement) { quitterPlacement(); return; }
+    if (!SOCIETES.length) {
+      demanderConfirmation({
+        titre: 'Aucune société',
+        question: 'Veuillez d\'abord créer une société avec le bouton « + Nouvelle société » : chaque tâche est rattachée à une société.',
+        bouton: 'OK',
+      });
+      return;
+    }
     entrerPlacement();
   });
   $('#tache-fermer').addEventListener('click', () => $('#dialogue-tache').close());
@@ -627,7 +635,7 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
   if (!$('#dialogue-tache').open) $('#dialogue-tache').showModal();
 
   if (!SOCIETES.length) {
-    erreur.textContent = 'Crée d\'abord une société (bouton « + Nouvelle société » du dashboard).';
+    erreur.textContent = 'Veuillez d\'abord créer une société (bouton « + Nouvelle société » du dashboard).';
     erreur.hidden = false;
   }
 }
@@ -640,10 +648,14 @@ function validerTache(e) {
   const societe = $('#tache-societe').value;
 
   const probleme =
-    !SOCIETES.length ? 'Crée d\'abord une société (bouton « + Nouvelle société » du dashboard).' :
-    !nom             ? 'Donne un nom à la tâche.' :
-    !deadline        ? 'Choisis une deadline.' :
-    !societe         ? 'Choisis la société concernée.' : null;
+    !SOCIETES.length ? 'Veuillez d\'abord créer une société (bouton « + Nouvelle société » du dashboard).' :
+    !nom             ? 'Veuillez donner un nom à la tâche.' :
+    !deadline        ? 'Veuillez choisir une deadline.' :
+    !societe         ? 'Veuillez choisir la société concernée.' :
+    // en création seulement : pas de deadline déjà passée (en modification,
+    // on laisse l'existante même dépassée)
+    (!tacheEnEdition && deadline < AUJOURDHUI.toISOString().slice(0, 10))
+                     ? 'Veuillez choisir une deadline à partir d\'aujourd\'hui.' : null;
 
   if (probleme) {
     erreur.textContent = probleme;
@@ -788,12 +800,19 @@ function validerSociete(e) {
   const erreur = $('#societe-erreur');
 
   if (!nom) {
-    erreur.textContent = 'Donne un nom à la société.';
+    erreur.textContent = 'Veuillez donner un nom à la société.';
     erreur.hidden = false;
     return;
   }
-  if (SOCIETES.some((s) => s.id !== societeEnEdition && s.nom.toLowerCase() === nom.toLowerCase())) {
-    erreur.textContent = 'Cette société existe déjà dans la liste.';
+  // le nom doit être libre, y compris parmi les sociétés clôturées : sinon,
+  // restaurer l'ancienne créerait deux sociétés du même nom
+  const homonyme = Stockage.societes.find(
+    (s) => s.id !== societeEnEdition && s.nom.toLowerCase() === nom.toLowerCase()
+  );
+  if (homonyme) {
+    erreur.textContent = homonyme.cloturee
+      ? 'Une société clôturée porte déjà ce nom. Veuillez la restaurer depuis la page « Sociétés clôturées » du menu, ou choisir un autre nom.'
+      : 'Cette société existe déjà dans la liste. Veuillez choisir un autre nom.';
     erreur.hidden = false;
     return;
   }

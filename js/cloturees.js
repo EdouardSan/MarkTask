@@ -56,6 +56,18 @@ document.getElementById('liste-cloturees').addEventListener('click', (e) => {
   if (!societe) return;
 
   if (e.target.closest('.btn-restaurer')) {
+    // pas deux sociétés du même nom sur le dashboard
+    const homonyme = Stockage.societes.find(
+      (s) => !s.cloturee && s.nom.toLowerCase() === societe.nom.toLowerCase()
+    );
+    if (homonyme) {
+      demanderConfirmation({
+        titre: 'Nom déjà utilisé',
+        question: `Une société active porte déjà le nom « ${societe.nom} ». Veuillez d'abord la renommer ou la supprimer avant de restaurer celle-ci.`,
+        bouton: 'OK',
+      });
+      return;
+    }
     // la société revient sur le dashboard, avec les tâches parties lors de la
     // clôture (celles réalisées avant restent dans « Tâches réalisées »)
     for (const tache of Stockage.taches) {

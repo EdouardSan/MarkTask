@@ -54,13 +54,21 @@ document.getElementById('liste-realisees').addEventListener('click', (e) => {
   if (!tache) return;
 
   if (e.target.closest('.btn-restaurer')) {
-    // une tâche d'une société clôturée n'aurait nulle part où réapparaître :
-    // il faut d'abord restaurer la société elle-même
+    // une tâche d'une société clôturée (ou disparue) n'aurait nulle part où
+    // réapparaître : il faut d'abord restaurer la société elle-même
     const societe = Stockage.societes.find((s) => s.id === tache.societe);
-    if (societe && societe.cloturee) {
+    if (!societe) {
+      demanderConfirmation({
+        titre: 'Société introuvable',
+        question: 'Impossible de restaurer cette tâche : la société qui lui était associée n\'existe plus.',
+        bouton: 'OK',
+      });
+      return;
+    }
+    if (societe.cloturee) {
       demanderConfirmation({
         titre: 'Société clôturée',
-        question: `La société « ${societe.nom} » est clôturée. Restaure-la d'abord depuis la page « Sociétés clôturées » du menu.`,
+        question: 'Veuillez d\'abord restaurer la société qui est actuellement clôturée avant de restaurer la tâche.',
         bouton: 'OK',
       });
       return;
