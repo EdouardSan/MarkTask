@@ -641,6 +641,9 @@ body {
 
 .dialogue-actions .btn-danger { margin-right: auto; padding: 10px 16px; font-size: 0.9rem; }
 
+/* dans l'encart de confirmation, Annuler à gauche et le bouton rouge à droite */
+#dialogue-confirmation .btn-danger { margin-right: 0; }
+
 /* ---- Pins du graphique -------------------------------------------------- */
 
 .pin {

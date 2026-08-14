@@ -31,6 +31,49 @@ window.addEventListener('unhandledrejection', (e) => {
   signalerProbleme(e.reason && e.reason.message ? e.reason.message : String(e.reason));
 });
 
+// ---- Encart de confirmation maison ---------------------------------------
+// Remplace confirm() et alert() du navigateur par une fenêtre au design de
+// l'app (sombre et bleu), disponible sur toutes les pages.
+//  - avec une action : Annuler / bouton rouge, l'action ne part qu'à la
+//    confirmation ;
+//  - sans action : simple message d'information avec un seul bouton OK.
+
+function demanderConfirmation({ titre, question, bouton = 'Confirmer' }, action) {
+  let dialogue = document.getElementById('dialogue-confirmation');
+  if (!dialogue) {
+    dialogue = document.createElement('dialog');
+    dialogue.className = 'dialogue';
+    dialogue.id = 'dialogue-confirmation';
+    dialogue.innerHTML = `
+      <h2 class="dialogue-titre"></h2>
+      <p class="dialogue-question"></p>
+      <div class="dialogue-actions">
+        <button class="btn-filtre" type="button" data-role="annuler">Annuler</button>
+        <button type="button" data-role="confirmer"></button>
+      </div>`;
+    document.body.appendChild(dialogue);
+    dialogue.querySelector('[data-role="annuler"]').addEventListener('click', () => {
+      dialogue._action = null;
+      dialogue.close();
+    });
+    dialogue.querySelector('[data-role="confirmer"]').addEventListener('click', () => {
+      const faire = dialogue._action;
+      dialogue._action = null;
+      dialogue.close();
+      if (faire) faire();
+    });
+  }
+
+  dialogue.querySelector('.dialogue-titre').textContent = titre;
+  dialogue.querySelector('.dialogue-question').textContent = question;
+  const btnConfirmer = dialogue.querySelector('[data-role="confirmer"]');
+  btnConfirmer.textContent = bouton;
+  btnConfirmer.className = action ? 'btn-danger' : 'btn-principal';
+  dialogue.querySelector('[data-role="annuler"]').hidden = !action;
+  dialogue._action = action || null;
+  dialogue.showModal();
+}
+
 const Stockage = {
   societes: [],
   taches: [],

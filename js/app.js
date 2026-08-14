@@ -509,12 +509,17 @@ function brancherEvenements() {
     modifierDepuisFiche();
   });
 
-  // cocher une tâche : elle part dans « Tâches réalisées »
+  // cocher une tâche : confirmation d'abord, puis elle part dans
+  // « Tâches réalisées » (la case est décochée en attendant la réponse)
   $('#liste-taches').addEventListener('change', (e) => {
     const li = e.target.closest('.tache');
     if (!li || !e.target.classList.contains('tache-case')) return;
     const tache = TACHES.find((t) => t.id === li.dataset.id);
-    if (tache) terminerTache(tache);
+    if (!tache) return;
+    e.target.checked = false;
+    tacheATerminer = tache.id;
+    $('#terminer-question').textContent = `Terminer la tâche « ${tache.nom} » ?`;
+    $('#dialogue-terminer').showModal();
   });
 
   // crayon en bout de ligne d'une tâche : volet Modifier / Supprimer
@@ -667,10 +672,16 @@ function validerTache(e) {
 
 function supprimerTacheEnEdition() {
   if (!tacheEnEdition) return;
-  if (!confirm('Supprimer définitivement cette tâche ?')) return;
-  Stockage.supprimerTache(tacheEnEdition);
-  tacheEnEdition = null;
-  $('#dialogue-tache').close();
+  const id = tacheEnEdition;
+  demanderConfirmation({
+    titre: 'Supprimer la tâche',
+    question: 'Supprimer définitivement cette tâche ?',
+    bouton: 'Supprimer',
+  }, () => {
+    Stockage.supprimerTache(id);
+    tacheEnEdition = null;
+    $('#dialogue-tache').close();
+  });
 }
 
 // ---- Volet Modifier / Supprimer (mobile : appui long ou crayon) ----------
@@ -693,11 +704,11 @@ function executerChoix(nom) {
 function ouvrirChoixTache(tache) {
   ouvrirChoix(`Tâche « ${tache.nom} »`, {
     modifier: () => ouvrirDialogueTache(tache),
-    supprimer: () => {
-      if (confirm(`Supprimer définitivement la tâche « ${tache.nom} » ?`)) {
-        Stockage.supprimerTache(tache.id);
-      }
-    },
+    supprimer: () => demanderConfirmation({
+      titre: 'Supprimer la tâche',
+      question: `Supprimer définitivement la tâche « ${tache.nom} » ?`,
+      bouton: 'Supprimer',
+    }, () => Stockage.supprimerTache(tache.id)),
   });
 }
 
@@ -810,13 +821,17 @@ function supprimerSociete(societe) {
     (!ouvertes.length      ? '.' :
      ouvertes.length === 1 ? ' et sa tâche dans « Tâches réalisées ».' :
      ` et ses ${ouvertes.length} tâches dans « Tâches réalisées ».`);
-  if (!confirm(question)) return;
-
-  const aujourdhui = new Date().toISOString().slice(0, 10);
-  for (const tache of ouvertes) {
-    Stockage.majTache({ ...tache, faite: true, realiseLe: aujourdhui, clotureeAvecSociete: true });
-  }
-  Stockage.majSociete({ ...societe, cloturee: true, clotureeLe: aujourdhui });
+  demanderConfirmation({
+    titre: 'Supprimer la société',
+    question,
+    bouton: 'Supprimer',
+  }, () => {
+    const aujourdhui = new Date().toISOString().slice(0, 10);
+    for (const tache of ouvertes) {
+      Stockage.majTache({ ...tache, faite: true, realiseLe: aujourdhui, clotureeAvecSociete: true });
+    }
+    Stockage.majSociete({ ...societe, cloturee: true, clotureeLe: aujourdhui });
+  });
 }
 
 function cocherTout(etat) {

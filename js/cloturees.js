@@ -70,9 +70,14 @@ document.getElementById('liste-cloturees').addEventListener('click', (e) => {
       !liees.length      ? `Supprimer définitivement la société « ${societe.nom} » ?` :
       liees.length === 1 ? `Supprimer définitivement la société « ${societe.nom} » et sa tâche ?` :
       `Supprimer définitivement la société « ${societe.nom} » et ses ${liees.length} tâches ?`;
-    if (!confirm(question)) return;
-    for (const tache of liees) Stockage.supprimerTache(tache.id);
-    Stockage.supprimerSociete(societe.id);
+    demanderConfirmation({
+      titre: 'Supprimer la société',
+      question,
+      bouton: 'Supprimer',
+    }, () => {
+      for (const tache of liees) Stockage.supprimerTache(tache.id);
+      Stockage.supprimerSociete(societe.id);
+    });
   }
 });
 
