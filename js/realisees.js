@@ -41,6 +41,7 @@ function afficherRealisees() {
     li.querySelector('.tache-nom').textContent = tache.nom;
     li.querySelector('.tache-meta').textContent =
       `${societe ? societe.nom : '?'}` +
+      (societe && societe.cloturee ? ' (société clôturée)' : '') +
       (tache.realiseLe ? ` · réalisée le ${FORMAT_DATE.format(dateDepuisTexte(tache.realiseLe))}` : '');
     liste.appendChild(li);
   }
@@ -53,8 +54,15 @@ document.getElementById('liste-realisees').addEventListener('click', (e) => {
   if (!tache) return;
 
   if (e.target.closest('.btn-restaurer')) {
+    // une tâche d'une société clôturée n'aurait nulle part où réapparaître :
+    // il faut d'abord restaurer la société elle-même
+    const societe = Stockage.societes.find((s) => s.id === tache.societe);
+    if (societe && societe.cloturee) {
+      alert(`La société « ${societe.nom} » est clôturée. Restaure-la d'abord depuis la page « Sociétés clôturées » du menu.`);
+      return;
+    }
     // la tâche redevient « à réaliser » : elle réapparaît sur le dashboard
-    Stockage.majTache({ ...tache, faite: false, realiseLe: null });
+    Stockage.majTache({ ...tache, faite: false, realiseLe: null, clotureeAvecSociete: null });
   } else if (e.target.closest('.btn-supprimer')) {
     if (!confirm('Supprimer définitivement cette tâche ?')) return;
     Stockage.supprimerTache(tache.id);

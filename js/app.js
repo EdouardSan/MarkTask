@@ -103,7 +103,14 @@ function afficherSocietes() {
       <label class="societe-label">
         <input class="societe-case" type="checkbox" data-societe="${societe.id}">
         <span class="pastille" style="--couleur:${societe.couleur}"></span>
-      </label>`;
+      </label>
+      <button class="societe-modifier" type="button" aria-label="Modifier ou supprimer la société">
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
+                fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>`;
     li.querySelector('.societe-case').checked = !decochees.has(societe.id);
     li.querySelector('.societe-label').append(societe.nom);
     liste.appendChild(li);
@@ -510,12 +517,20 @@ function brancherEvenements() {
     if (tache) terminerTache(tache);
   });
 
-  // crayon en bout de ligne (mobile) : volet Modifier / Supprimer
+  // crayon en bout de ligne d'une tâche : volet Modifier / Supprimer
   $('#liste-taches').addEventListener('click', (e) => {
     const bouton = e.target.closest('.tache-modifier');
     if (!bouton) return;
     const tache = TACHES.find((t) => t.id === bouton.closest('.tache').dataset.id);
     if (tache) ouvrirChoixTache(tache);
+  });
+
+  // crayon en bout de ligne d'une société : volet Modifier / Supprimer
+  $('#liste-societes').addEventListener('click', (e) => {
+    const bouton = e.target.closest('.societe-modifier');
+    if (!bouton) return;
+    const societe = SOCIETES.find((s) => s.id === bouton.closest('.societe').dataset.id);
+    if (societe) ouvrirChoixSociete(societe);
   });
 
   // appui long (mobile) sur une société ou une tâche : volet Modifier / Supprimer
@@ -783,17 +798,25 @@ function validerSociete(e) {
   $('#dialogue-societe').close();
 }
 
-// La suppression emporte aussi les tâches de la société (à faire et réalisées) :
-// une tâche sans société ne pourrait plus s'afficher nulle part.
+// « Supprimer » une société = la clôturer : elle part dans la page
+// « Sociétés clôturées » et ses tâches encore à faire basculent dans
+// « Tâches réalisées » (marquées clotureeAvecSociete pour pouvoir revenir
+// toutes ensemble si la société est restaurée). La suppression définitive
+// se fait depuis la page « Sociétés clôturées ».
 function supprimerSociete(societe) {
-  const liees = TACHES.filter((t) => t.societe === societe.id);
+  const ouvertes = TACHES.filter((t) => t.societe === societe.id && !t.faite);
   const question =
-    !liees.length      ? `Supprimer la société « ${societe.nom} » ?` :
-    liees.length === 1 ? `Supprimer la société « ${societe.nom} » et sa tâche ?` :
-    `Supprimer la société « ${societe.nom} » et ses ${liees.length} tâches ?`;
+    `Supprimer la société « ${societe.nom} » ? Elle partira dans « Sociétés clôturées »` +
+    (!ouvertes.length      ? '.' :
+     ouvertes.length === 1 ? ' et sa tâche dans « Tâches réalisées ».' :
+     ` et ses ${ouvertes.length} tâches dans « Tâches réalisées ».`);
   if (!confirm(question)) return;
-  for (const tache of liees) Stockage.supprimerTache(tache.id);
-  Stockage.supprimerSociete(societe.id);
+
+  const aujourdhui = new Date().toISOString().slice(0, 10);
+  for (const tache of ouvertes) {
+    Stockage.majTache({ ...tache, faite: true, realiseLe: aujourdhui, clotureeAvecSociete: true });
+  }
+  Stockage.majSociete({ ...societe, cloturee: true, clotureeLe: aujourdhui });
 }
 
 function cocherTout(etat) {
@@ -805,7 +828,8 @@ function cocherTout(etat) {
 // ---- Démarrage -----------------------------------------------------------
 
 function rafraichirTout() {
-  SOCIETES = Stockage.societes;
+  // les sociétés clôturées vivent sur leur propre page, pas sur le dashboard
+  SOCIETES = Stockage.societes.filter((s) => !s.cloturee);
   TACHES = Stockage.taches;
   afficherSocietes();
   afficherTaches();

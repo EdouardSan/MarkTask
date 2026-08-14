@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sociétés clôturées — MarkTask</title>
+  <meta name="theme-color" content="#07070A">
+  <link rel="icon" type="image/png" href="assets/logo-512.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/logo-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="btn-retour" href="index.html" aria-label="Retour au dashboard">&larr;</a>
+    <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
+    <h1 class="app-title">MarkTask</h1>
+  </header>
+
+  <main class="page-liste">
+    <section class="carte" aria-label="Sociétés clôturées">
+      <h2 class="carte-titre">Sociétés clôturées</h2>
+      <ul class="liste-taches" id="liste-cloturees">
+        <!-- rempli par js/cloturees.js -->
+      </ul>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/stockage.js"></script>
+  <script src="js/cloturees.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  </script>
+</body>
+</html>

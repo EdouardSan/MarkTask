@@ -603,7 +603,8 @@ body {
   cursor: pointer;
 }
 
-.tache:has(.tache-case) { padding-right: 46px; }
+/* place pour le crayon Modifier puis la case « réalisée » */
+.tache:has(.tache-case) { padding-right: 90px; }
 
 /* boutons Restaurer / Supprimer sur la page Tâches réalisées */
 .tache-actions {
@@ -742,10 +743,11 @@ body {
   cursor: pointer;
 }
 
-/* crayons Modifier : mobile uniquement (desktop = clic sur le pin) */
+/* crayons Modifier (fiche du graphique, lignes de tâches, sociétés) */
 .fiche-modifier,
-.tache-modifier {
-  display: none;
+.tache-modifier,
+.societe-modifier {
+  display: grid;
   position: absolute;
   place-items: center;
   width: 32px;
@@ -758,7 +760,19 @@ body {
   cursor: pointer;
 }
 
+:is(.fiche-modifier, .tache-modifier, .societe-modifier):hover {
+  color: var(--texte);
+  border-color: var(--texte-2nd);
+}
+
+:is(.fiche-modifier, .tache-modifier, .societe-modifier):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* crayon de la fiche : mobile uniquement (desktop = clic sur le pin) */
 .fiche-modifier {
+  display: none;
   top: 8px;
   right: 8px;
 }
@@ -769,6 +783,19 @@ body {
   right: 44px;
   translate: 0 -50%;
 }
+
+/* en bout de ligne d'une société */
+.societe-modifier {
+  top: 50%;
+  right: 2px;
+  translate: 0 -50%;
+  width: 28px;
+  height: 28px;
+}
+
+.societe { position: relative; }
+
+.societe .societe-label { padding-right: 38px; }
 
 /* ---- Surbrillance de la tâche correspondante dans la liste -------------- */
 
@@ -1029,13 +1056,10 @@ body {
     height: 22px;
   }
 
-  /* crayons Modifier visibles (fiche du graphique et lignes de tâches) */
-  .fiche-modifier,
-  .tache-modifier { display: grid; }
+  /* crayon Modifier de la fiche du graphique (desktop = clic sur le pin) */
+  .fiche-modifier { display: grid; }
 
   .fiche-nom { padding-right: 38px; }        /* le nom ne passe pas sous le crayon */
-
-  .tache:has(.tache-case) { padding-right: 90px; }
 
   /* l'appui long ouvre le volet Modifier / Supprimer :
      pas de sélection de texte ni de menu natif par-dessus */
