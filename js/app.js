@@ -78,6 +78,27 @@ function societeDe(tache) {
   return SOCIETES.find((s) => s.id === tache.societe);
 }
 
+// ---- Ordre des sociétés ---------------------------------------------------
+// Chaque société porte un rang « ordre » (0, 1, 2…) fixé quand on les range à
+// la main dans le panneau. Celles qui n'en ont pas encore restent en queue,
+// dans leur ordre d'arrivée. Ce même ordre sert partout : panneau Sociétés et
+// liste déroulante de la fenêtre de tâche.
+
+function rangSociete(societe) {
+  return Number.isFinite(societe.ordre) ? societe.ordre : Number.MAX_SAFE_INTEGER;
+}
+
+function trierSocietes(liste) {
+  return liste.slice().sort((a, b) => rangSociete(a) - rangSociete(b));   // tri stable
+}
+
+// rang à donner à une nouvelle société : après toutes les autres — ou aucun
+// rang tant que personne n'a encore rangé la liste (sinon elle passerait devant)
+function ordrePourNouvelleSociete() {
+  const rangs = Stockage.societes.map((s) => s.ordre).filter(Number.isFinite);
+  return rangs.length ? Math.max(...rangs) + 1 : undefined;
+}
+
 function societesCochees() {
   const cochees = new Set();
   document.querySelectorAll('.societe-case:checked')
@@ -89,6 +110,9 @@ function societesCochees() {
 
 function afficherSocietes() {
   const liste = $('#liste-societes');
+  // pendant un glisser-déposer, on ne touche pas à la liste : elle sera
+  // redessinée au relâchement
+  if (reordonnancementEnCours) return;
   // conserve l'état des cases avant de redessiner (nouvelle société : cochée)
   const cases = document.querySelectorAll('.societe-case');
   const decochees = new Set();
@@ -238,6 +262,7 @@ let modePlacement = false;      // desktop : en attente d'un clic sur le graphe
 let tacheEnEdition = null;      // id de la tâche en cours de modification
 let clicSimpleEnAttente = null; // délai du simple clic, annulé par le double-clic
 let tacheATerminer = null;      // id de la tâche visée par la confirmation de fin
+let reordonnancementEnCours = false; // une société est en train d'être déplacée
 
 // ---- Terminer une tâche (et fêter ça) ------------------------------------
 
@@ -538,11 +563,12 @@ function brancherEvenements() {
     if (societe) ouvrirChoixSociete(societe);
   });
 
-  // appui long (mobile) sur une société ou une tâche : volet Modifier / Supprimer
-  brancherAppuiLong($('#liste-societes'), '.societe', (li) => {
-    const societe = SOCIETES.find((s) => s.id === li.dataset.id);
-    if (societe) ouvrirChoixSociete(societe);
-  });
+  // sociétés : glisser-déposer pour les ranger (ordinateur : cliquer-glisser ;
+  // téléphone : appui long puis glisser — l'appui long sans bouger ouvre
+  // toujours le volet Modifier / Supprimer)
+  brancherReordonnancement($('#liste-societes'));
+
+  // appui long (mobile) sur une tâche : volet Modifier / Supprimer
   brancherAppuiLong($('#liste-taches'), '.tache', (li) => {
     const tache = TACHES.find((t) => t.id === li.dataset.id);
     if (tache) ouvrirChoixTache(tache);
@@ -580,6 +606,7 @@ function brancherEvenements() {
   $('#tache-fermer').addEventListener('click', () => $('#dialogue-tache').close());
   $('#formulaire-tache').addEventListener('submit', validerTache);
   $('#tache-supprimer').addEventListener('click', supprimerTacheEnEdition);
+  brancherSelecteurSociete();
   $('#tache-importance').addEventListener('input', (e) => {
     $('#tache-importance-valeur').textContent = e.target.value;
   });
@@ -609,15 +636,8 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
   const erreur = $('#tache-erreur');
   erreur.hidden = true;
 
-  // la liste déroulante des sociétés reflète le panneau
-  const select = $('#tache-societe');
-  select.innerHTML = '';
-  for (const societe of SOCIETES) {
-    const option = document.createElement('option');
-    option.value = societe.id;
-    option.textContent = societe.nom;
-    select.appendChild(option);
-  }
+  // la liste déroulante des sociétés reflète le panneau (mêmes pastilles, même ordre)
+  remplirSelecteurSociete(tache ? tache.societe : null);
 
   $('#tache-dialogue-titre').textContent = tache ? 'Modifier la tâche' : 'Nouvelle tâche';
   $('#tache-valider').textContent = tache ? 'Enregistrer' : 'Ajouter';
@@ -629,7 +649,6 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
   $('#tache-deadline').value = tache ? tache.deadline : '';
   // en création, pas de deadline passée ; en modification, on ne bloque pas l'existante
   $('#tache-deadline').min = tache ? '' : AUJOURDHUI.toISOString().slice(0, 10);
-  if (tache) select.value = tache.societe;
   $('#tache-importance').value = importance;
   $('#tache-importance-valeur').textContent = importance;
   if (!$('#dialogue-tache').open) $('#dialogue-tache').showModal();
@@ -640,12 +659,72 @@ function ouvrirDialogueTache(tache, importanceInitiale) {
   }
 }
 
+// ---- Liste déroulante des sociétés (fenêtre de tâche) --------------------
+// Une liste maison plutôt qu'un <select> natif : elle affiche la pastille de
+// couleur de chaque société, dans l'ordre exact du panneau Sociétés.
+
+function remplirSelecteurSociete(idChoisi) {
+  const options = $('#tache-societe-options');
+  options.innerHTML = '';
+  for (const societe of SOCIETES) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <button class="selecteur-option" type="button" role="option">
+        <span class="pastille"></span>
+        <span class="selecteur-texte"></span>
+      </button>`;
+    const bouton = li.querySelector('.selecteur-option');
+    bouton.dataset.id = societe.id;
+    bouton.querySelector('.pastille').style.setProperty('--couleur', societe.couleur);
+    bouton.querySelector('.selecteur-texte').textContent = societe.nom;
+    options.appendChild(li);
+  }
+  const existe = SOCIETES.some((s) => s.id === idChoisi);
+  choisirSociete(existe ? idChoisi : (SOCIETES[0] ? SOCIETES[0].id : ''));
+  $('#tache-societe').open = false;
+}
+
+function choisirSociete(id) {
+  const selecteur = $('#tache-societe');
+  const societe = SOCIETES.find((s) => s.id === id);
+  selecteur.dataset.value = societe ? societe.id : '';
+  $('#tache-societe-pastille').style.setProperty('--couleur', societe ? societe.couleur : 'transparent');
+  $('#tache-societe-texte').textContent = societe ? societe.nom : 'Aucune société';
+  selecteur.querySelectorAll('.selecteur-option').forEach((bouton) => {
+    bouton.classList.toggle('selecteur-option-active', bouton.dataset.id === selecteur.dataset.value);
+    bouton.setAttribute('aria-selected', bouton.dataset.id === selecteur.dataset.value);
+  });
+}
+
+function brancherSelecteurSociete() {
+  const selecteur = $('#tache-societe');
+  const dialogue = $('#dialogue-tache');
+
+  $('#tache-societe-options').addEventListener('click', (e) => {
+    const bouton = e.target.closest('.selecteur-option');
+    if (!bouton) return;
+    choisirSociete(bouton.dataset.id);
+    selecteur.open = false;
+    selecteur.querySelector('summary').focus();
+  });
+
+  // un clic ailleurs dans la fenêtre referme la liste
+  dialogue.addEventListener('click', (e) => {
+    if (selecteur.open && !e.target.closest('#tache-societe')) selecteur.open = false;
+  });
+
+  // Échap referme d'abord la liste, pas toute la fenêtre
+  dialogue.addEventListener('cancel', (e) => {
+    if (selecteur.open) { e.preventDefault(); selecteur.open = false; }
+  });
+}
+
 function validerTache(e) {
   e.preventDefault();
   const erreur = $('#tache-erreur');
   const nom = $('#tache-nom').value.trim();
   const deadline = $('#tache-deadline').value;
-  const societe = $('#tache-societe').value;
+  const societe = $('#tache-societe').dataset.value || '';
 
   const probleme =
     !SOCIETES.length ? 'Veuillez d\'abord créer une société (bouton « + Nouvelle société » du dashboard).' :
@@ -779,6 +858,144 @@ function brancherAppuiLong(liste, selecteur, action) {
   }, true);
 }
 
+// ---- Ranger les sociétés par glisser-déposer -----------------------------
+// Ordinateur : on clique sur une ligne et, sans relâcher, on la déplace.
+// Téléphone : appui long (une demi-seconde) → la ligne « se soulève », puis on
+// la fait glisser ; relâcher sans avoir bougé ouvre le volet Modifier /
+// Supprimer, comme avant. L'ordre obtenu est enregistré (champ « ordre ») et
+// vaut pour tous les appareils.
+function brancherReordonnancement(liste) {
+  let ligne = null;          // ligne suivie depuis le pointerdown
+  let depart = null;         // position du pointeur au départ
+  let minuteur = null;       // appui long (mobile)
+  let ordreInitial = null;   // ids dans l'ordre avant le déplacement
+  let aBouge = false;        // la ligne a-t-elle changé de place ?
+  let etouffer = false;      // étouffer le clic qui suit un geste consommé
+
+  const lignes = () => Array.from(liste.querySelectorAll('.societe'));
+
+  const commencer = () => {
+    reordonnancementEnCours = true;
+    aBouge = false;
+    ordreInitial = lignes().map((li) => li.dataset.id);
+    ligne.classList.add('societe-deplacee');
+    liste.classList.add('liste-reordonne');
+    document.body.classList.add('reordonne');
+    if (ligne.setPointerCapture && depart.pointerId !== undefined) {
+      try { ligne.setPointerCapture(depart.pointerId); } catch (_) { /* pas grave */ }
+    }
+  };
+
+  const deplacerVers = (y) => {
+    // fait défiler la liste si le pointeur en frôle un bord
+    const cadre = liste.getBoundingClientRect();
+    if (y < cadre.top + 28) liste.scrollTop -= 8;
+    else if (y > cadre.bottom - 28) liste.scrollTop += 8;
+
+    // la ligne prend la place de la première ligne dont le milieu est sous le pointeur
+    let cible = null;
+    for (const autre of lignes()) {
+      if (autre === ligne) continue;
+      const rect = autre.getBoundingClientRect();
+      if (y < rect.top + rect.height / 2) { cible = autre; break; }
+    }
+    if (cible ? ligne.nextElementSibling !== cible : ligne !== liste.lastElementChild) {
+      if (cible) liste.insertBefore(ligne, cible);
+      else liste.appendChild(ligne);
+      aBouge = true;
+    }
+  };
+
+  const enregistrer = () => {
+    const ids = lignes().map((li) => li.dataset.id);
+    if (ids.join() === ordreInitial.join()) return false;
+    ids.forEach((id, index) => {
+      const societe = SOCIETES.find((s) => s.id === id);
+      if (societe && societe.ordre !== index) Stockage.majSociete({ ...societe, ordre: index });
+    });
+    return true;
+  };
+
+  const terminer = (annule) => {
+    clearTimeout(minuteur);
+    minuteur = null;
+    if (!ligne) return;
+    const li = ligne;
+    const enCours = reordonnancementEnCours;
+    ligne = null;
+    depart = null;
+    if (!enCours) return;
+
+    reordonnancementEnCours = false;
+    li.classList.remove('societe-deplacee');
+    liste.classList.remove('liste-reordonne');
+    document.body.classList.remove('reordonne');
+    etouffer = true;
+    setTimeout(() => { etouffer = false; }, 400);
+
+    const modifie = !annule && enregistrer();
+    // redessine depuis les données (un rafraîchissement a pu être ignoré
+    // pendant le geste ; et si le geste est annulé, la liste reprend sa forme)
+    if (!modifie) rafraichirTout();
+
+    // téléphone : appui long sans bouger = volet Modifier / Supprimer
+    if (!annule && !aBouge && MOBILE.matches) {
+      const societe = SOCIETES.find((s) => s.id === li.dataset.id);
+      if (societe) ouvrirChoixSociete(societe);
+    }
+  };
+
+  liste.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
+    if (e.target.closest('.societe-modifier')) return;   // le crayon reste un simple bouton
+    const li = e.target.closest('.societe');
+    if (!li) return;
+    ligne = li;
+    etouffer = false;    // le clic à étouffer, s'il devait venir, serait déjà passé
+    depart = { x: e.clientX, y: e.clientY, pointerId: e.pointerId };
+    clearTimeout(minuteur);
+    if (MOBILE.matches) {
+      // téléphone : la ligne se soulève après un appui long immobile
+      minuteur = setTimeout(() => { minuteur = null; if (ligne) commencer(); }, 500);
+    }
+  });
+
+  liste.addEventListener('pointermove', (e) => {
+    if (!ligne || !depart) return;
+    if (reordonnancementEnCours) { deplacerVers(e.clientY); return; }
+    const distance = Math.hypot(e.clientX - depart.x, e.clientY - depart.y);
+    if (MOBILE.matches) {
+      // le doigt bouge avant l'appui long : c'est un défilement, pas un rangement
+      if (distance > 12) terminer(true);
+    } else if (distance > 5) {
+      // ordinateur : le déplacement commence dès que la souris bouge, bouton enfoncé
+      commencer();
+      deplacerVers(e.clientY);
+    }
+  });
+
+  liste.addEventListener('pointerup', () => terminer(false));
+  liste.addEventListener('pointercancel', () => terminer(true));
+
+  // pendant le geste, le doigt déplace la ligne : pas la page ni la liste
+  liste.addEventListener('touchmove', (e) => {
+    if (reordonnancementEnCours) e.preventDefault();
+  }, { passive: false });
+
+  // pas de menu contextuel natif pendant l'appui long
+  liste.addEventListener('contextmenu', (e) => {
+    if (MOBILE.matches || reordonnancementEnCours) e.preventDefault();
+  });
+
+  // un geste consommé ne doit pas aussi cocher/décocher la case de la ligne
+  liste.addEventListener('click', (e) => {
+    if (!etouffer) return;
+    etouffer = false;
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+}
+
 // ---- Ajout, modification et suppression d'une société --------------------
 
 let societeEnEdition = null;   // id de la société en cours de modification
@@ -822,7 +1039,10 @@ function validerSociete(e) {
     const societe = SOCIETES.find((s) => s.id === societeEnEdition);
     Stockage.majSociete({ ...societe, nom, couleur });
   } else {
-    Stockage.creerSociete({ id: crypto.randomUUID(), nom, couleur });
+    const societe = { id: crypto.randomUUID(), nom, couleur };
+    const ordre = ordrePourNouvelleSociete();
+    if (ordre !== undefined) societe.ordre = ordre;
+    Stockage.creerSociete(societe);
   }
   societeEnEdition = null;
   $('#dialogue-societe').close();
@@ -863,7 +1083,7 @@ function cocherTout(etat) {
 
 function rafraichirTout() {
   // les sociétés clôturées vivent sur leur propre page, pas sur le dashboard
-  SOCIETES = Stockage.societes.filter((s) => !s.cloturee);
+  SOCIETES = trierSocietes(Stockage.societes.filter((s) => !s.cloturee));
   TACHES = Stockage.taches;
   afficherSocietes();
   afficherTaches();

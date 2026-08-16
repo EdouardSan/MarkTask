@@ -800,6 +800,28 @@ body {
 
 .societe .societe-label { padding-right: 38px; }
 
+/* ---- Ranger les sociétés par glisser-déposer ---------------------------- */
+
+/* la ligne que l'on déplace « se soulève » ; les autres glissent en douceur */
+.societe-deplacee {
+  background: #24344F;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), inset 0 0 0 1px var(--accent-fonce);
+  border-radius: 8px;
+  border-bottom-color: transparent;
+  scale: 1.02;
+  z-index: 2;
+}
+
+.liste-reordonne .societe { transition: scale 0.15s; }
+
+/* pendant le geste : main fermée, aucun texte sélectionné */
+body.reordonne,
+body.reordonne * {
+  cursor: grabbing !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* ---- Surbrillance de la tâche correspondante dans la liste -------------- */
 
 .tache-surbrillance {
@@ -890,6 +912,86 @@ body {
 .champ input[type="range"] {
   accent-color: var(--accent);
   cursor: pointer;
+}
+
+/* liste déroulante maison des sociétés (avec pastilles) */
+.selecteur-valeur {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--carte-bord);
+  border-radius: 9px;
+  background: var(--fond);
+  color: var(--texte);
+  font-size: 1rem;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.selecteur-valeur::-webkit-details-marker { display: none; }
+
+.selecteur-valeur:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.selecteur-valeur .chevron {
+  margin-left: auto;
+  transform: rotate(90deg);
+}
+
+.selecteur[open] .selecteur-valeur .chevron { transform: rotate(-90deg); }
+
+.selecteur-texte {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* la liste s'ouvre dans le flux (la fenêtre s'allonge) : rien n'est coupé,
+   même sur un petit écran où la fenêtre défile */
+.selecteur-options {
+  margin-top: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--carte-bord);
+  border-radius: 9px;
+  background: var(--carte);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  scrollbar-width: thin;
+  scrollbar-color: #2A2E34 transparent;
+}
+
+.selecteur-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 7px;
+  background: none;
+  color: var(--texte);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.selecteur-option:hover { background: rgba(175, 207, 254, 0.1); }
+
+.selecteur-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.selecteur-option-active {
+  background: #24344F;
 }
 
 .champ-couleur input {
@@ -1066,6 +1168,7 @@ body {
 
   /* l'appui long ouvre le volet Modifier / Supprimer :
      pas de sélection de texte ni de menu natif par-dessus */
+  .societe,
   .societe-label,
   .tache {
     user-select: none;

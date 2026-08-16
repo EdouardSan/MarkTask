@@ -40,7 +40,10 @@ Ouvre simplement le lien dans ton navigateur et **mets-le en favori**
 - **Terminer** : coche la tâche dans la liste, ou double-clique sur son point
   (téléphone : bouton « Terminer la tâche » dans la petite fiche).
 - **Les sociétés** : panneau de droite — on en ajoute, on les coche/décoche
-  pour filtrer le graphique.
+  pour filtrer le graphique. Pour les ranger dans l'ordre que tu veux : clique
+  sur une société et, sans relâcher, déplace-la dans la liste (téléphone :
+  reste appuyé une demi-seconde, puis fais-la glisser). Cet ordre est repris
+  dans la liste des sociétés quand tu crées une tâche.
 - **Tâches réalisées** : menu ☰ en haut à gauche.
 
 ## Bon à savoir

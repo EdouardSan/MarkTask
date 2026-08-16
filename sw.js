@@ -2,7 +2,7 @@
 // Met l'app en cache pour qu'elle s'ouvre et fonctionne sans connexion.
 // (Les données, elles, sont gérées par le cache hors-ligne de Firestore.)
 
-const CACHE = 'marktask-v5';
+const CACHE = 'marktask-v6';
 
 const FICHIERS = [
   './',

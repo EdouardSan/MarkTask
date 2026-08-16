@@ -21,7 +21,7 @@
       <nav class="menu-panneau">
         <a class="menu-lien" href="taches-realisees.html">Tâches réalisées</a>
         <a class="menu-lien" href="societes-cloturees.html">Sociétés clôturées</a>
-        <span class="menu-version">version 36</span>
+        <span class="menu-version">version 37</span>
       </nav>
     </details>
     <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
@@ -139,10 +139,18 @@
         Deadline
         <input type="date" id="tache-deadline">
       </label>
-      <label class="champ">
-        Société concernée
-        <select id="tache-societe"></select>
-      </label>
+      <div class="champ">
+        <span id="tache-societe-label">Société concernée</span>
+        <!-- liste déroulante maison : la native ne sait pas afficher les pastilles -->
+        <details class="selecteur" id="tache-societe">
+          <summary class="selecteur-valeur" aria-labelledby="tache-societe-label">
+            <span class="pastille" id="tache-societe-pastille"></span>
+            <span class="selecteur-texte" id="tache-societe-texte"></span>
+            <span class="chevron" aria-hidden="true"></span>
+          </summary>
+          <ul class="selecteur-options" id="tache-societe-options"></ul>
+        </details>
+      </div>
       <label class="champ">
         <span>Importance : <output id="tache-importance-valeur">50</output>/100</span>
         <input type="range" id="tache-importance" min="0" max="100" value="50">
