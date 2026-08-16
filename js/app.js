@@ -141,6 +141,33 @@ function afficherSocietes() {
   }
 }
 
+// ---- Tri de la liste « Tâches à réaliser » --------------------------------
+// Par défaut par urgence (deadline la plus proche en tête) ; le choix
+// Importance / Couleur (= ordre des sociétés du panneau) est mémorisé sur
+// l'appareil.
+
+const CLE_TRI = 'marktask.tri.v1';
+const TRIS = ['urgence', 'importance', 'couleur'];
+let triTaches = TRIS.includes(localStorage.getItem(CLE_TRI)) ? localStorage.getItem(CLE_TRI) : 'urgence';
+
+function trierTaches(taches) {
+  const parUrgence = (a, b) => String(a.deadline).localeCompare(String(b.deadline)) || b.importance - a.importance;
+  const parImportance = (a, b) => b.importance - a.importance || parUrgence(a, b);
+  const rangCouleur = (t) => { const i = SOCIETES.findIndex((s) => s.id === t.societe); return i === -1 ? 1e9 : i; };
+  const parCouleur = (a, b) => (rangCouleur(a) - rangCouleur(b)) || parUrgence(a, b);
+  const comparer = triTaches === 'importance' ? parImportance : triTaches === 'couleur' ? parCouleur : parUrgence;
+  return taches.slice().sort(comparer);
+}
+
+function choisirTri(tri) {
+  triTaches = tri;
+  try { localStorage.setItem(CLE_TRI, tri); } catch (_) { /* pas grave */ }
+  document.querySelectorAll('.btn-tri').forEach((b) => {
+    b.setAttribute('aria-pressed', String(b.dataset.tri === tri));
+  });
+  afficherTaches();
+}
+
 // ---- Rendu : liste « Tâches à réaliser » --------------------------------
 
 // tâches dépliées dans la liste (l'état survit aux redessins/synchronisations)
@@ -159,8 +186,7 @@ function afficherTaches() {
     return;
   }
 
-  const ordonnees = aFaire.sort((a, b) => a.deadline.localeCompare(b.deadline));
-  for (const tache of ordonnees) {
+  for (const tache of trierTaches(aFaire)) {
     const societe = societeDe(tache);
     const jours = joursRestants(tache);
     const li = document.createElement('li');
@@ -578,6 +604,12 @@ function brancherEvenements() {
   $('#choix-fermer').addEventListener('click', () => $('#dialogue-choix').close());
   $('#choix-modifier').addEventListener('click', () => executerChoix('modifier'));
   $('#choix-supprimer').addEventListener('click', () => executerChoix('supprimer'));
+
+  // tri de la liste des tâches
+  document.querySelectorAll('.btn-tri').forEach((b) => {
+    b.addEventListener('click', () => choisirTri(b.dataset.tri));
+  });
+  choisirTri(triTaches);
 
   // filtre par société
   $('#liste-societes').addEventListener('change', afficherPins);

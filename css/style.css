@@ -429,6 +429,28 @@ body {
   max-height: 38vh;             /* la liste défile en interne si besoin */
 }
 
+/* boutons de tri au-dessus de la liste des tâches */
+.tri-taches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px 10px;
+}
+
+.tri-libelle {
+  font-size: 0.78rem;
+  color: var(--texte-2nd);
+}
+
+.btn-filtre.btn-tri { flex: none; padding: 6px 12px; }
+
+.btn-tri[aria-pressed="true"] {
+  color: var(--texte);
+  border-color: var(--accent);
+  background: rgba(175, 207, 254, 0.12);
+}
+
 /* ---- Barres de défilement discrètes ------------------------------------ */
 
 .liste-taches,

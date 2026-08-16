@@ -21,7 +21,7 @@
       <nav class="menu-panneau">
         <a class="menu-lien" href="taches-realisees.html">Tâches réalisées</a>
         <a class="menu-lien" href="societes-cloturees.html">Sociétés clôturées</a>
-        <span class="menu-version">version 37</span>
+        <span class="menu-version">version 38</span>
       </nav>
     </details>
     <img class="app-logo" src="assets/logo-512.png" alt="Logo MarkTask">
@@ -95,6 +95,12 @@
         <summary class="carte-titre-repliable">
           <span class="chevron" aria-hidden="true"></span>Tâches à réaliser
         </summary>
+        <div class="tri-taches" role="group" aria-label="Trier les tâches">
+          <span class="tri-libelle">Trier par</span>
+          <button class="btn-filtre btn-tri" type="button" data-tri="urgence" aria-pressed="true">Urgence</button>
+          <button class="btn-filtre btn-tri" type="button" data-tri="importance" aria-pressed="false">Importance</button>
+          <button class="btn-filtre btn-tri" type="button" data-tri="couleur" aria-pressed="false">Couleur</button>
+        </div>
         <ul class="liste-taches" id="liste-taches">
           <!-- rempli par js/app.js -->
         </ul>
