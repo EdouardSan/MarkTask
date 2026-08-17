@@ -756,6 +756,9 @@ body {
   margin: 7px 0;
   font-size: 0.85rem;
   line-height: 1.45;
+  /* quand la fiche manque de place autour du pin, app.js borne la hauteur
+     de la description : elle défile alors en interne */
+  overflow-y: auto;
 }
 
 /* bouton Terminer de la fiche : mobile uniquement (desktop = double-clic) */

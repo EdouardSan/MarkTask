@@ -377,23 +377,55 @@ function montrerFiche(pin) {
   fiche.style.pointerEvents = MOBILE.matches ? 'auto' : 'none';
 
   // position en pixels, avec rabattement : à droite du pin si la place existe,
-  // sinon à gauche — et toujours ramenée entière dans le cadre du graphique
+  // sinon à gauche — et toujours ramenée entière dans le cadre du graphique.
+  // La fiche ne doit JAMAIS recouvrir le pin : sur téléphone elle est
+  // interactive, et posée sous le doigt elle avalerait l'appui suivant
+  // (et se refermait aussitôt via les événements souris synthétisés).
   const zone = $('#graphique-zone');
   const largeurZone = zone.clientWidth;
   const hauteurZone = zone.clientHeight;
   const pinX = (parseFloat(pin.style.left) / 100) * largeurZone;
   const pinY = (parseFloat(pin.style.bottom) / 100) * hauteurZone;
   const marge = 6;
+  // espace entre le centre du pin et le bord de la fiche : le pin appuyé est
+  // grossi (scale 1.35 → 13,5 px de demi-hauteur), la fiche reste au-delà
+  const ecart = 18;
   const largeurFiche = fiche.offsetWidth;
-  const hauteurFiche = fiche.offsetHeight;
 
   let gauche = pinX + 18;
   if (gauche + largeurFiche > largeurZone - marge) gauche = pinX - largeurFiche - 18;
   gauche = Math.max(marge, Math.min(gauche, largeurZone - largeurFiche - marge));
 
-  let bas = pinY + 14;
-  if (bas + hauteurFiche > hauteurZone - marge) bas = pinY - hauteurFiche - 14;
-  bas = Math.max(marge, Math.min(bas, hauteurZone - hauteurFiche - marge));
+  // à la verticale : au-dessus du pin, sinon en dessous. Si aucun des deux
+  // côtés ne suffit (pin au milieu, longue description), la description est
+  // raccourcie — elle défile alors en interne — jusqu'à ce que la fiche
+  // tienne du côté le plus spacieux ; et s'il en faut encore, la fiche
+  // déborde un peu au-dessus du cadre (l'espace libre en haut de la carte)
+  // plutôt que de recouvrir le pin.
+  const desc = $('#fiche-desc');
+  desc.style.maxHeight = '';
+  const placeDessus = hauteurZone - marge - (pinY + ecart);
+  const placeDessous = pinY - ecart - marge;
+  // hauteurs mesurées en fractionnaire (getBoundingClientRect) : offsetHeight
+  // arrondit, et un pixel de trop ferait basculer la fiche du mauvais côté
+  let hauteurFiche = fiche.getBoundingClientRect().height;
+  const place = Math.max(placeDessus, placeDessous);
+  if (hauteurFiche > place && !desc.hidden) {
+    // d'abord en gardant au moins deux lignes de description…
+    desc.style.maxHeight =
+      Math.max(42, desc.getBoundingClientRect().height - (hauteurFiche - place) - 2) + 'px';
+    hauteurFiche = fiche.getBoundingClientRect().height;
+    // …et s'il manque encore quelques pixels, une seule ligne
+    if (hauteurFiche > place) {
+      desc.style.maxHeight =
+        Math.max(22, parseFloat(desc.style.maxHeight) - (hauteurFiche - place) - 2) + 'px';
+      hauteurFiche = fiche.getBoundingClientRect().height;
+    }
+  }
+  let bas;
+  if (hauteurFiche <= placeDessus)       bas = pinY + ecart;                 // au-dessus
+  else if (hauteurFiche <= placeDessous) bas = pinY - ecart - hauteurFiche;  // en dessous
+  else bas = pinY + ecart;   // déborde du cadre en haut, mais jamais sur le pin
 
   fiche.style.right = 'auto';
   fiche.style.top = 'auto';
@@ -443,21 +475,27 @@ function surligner(id, actif) {
 function brancherEvenements() {
   const zone = $('#graphique-zone');
 
-  // souris : survol d'un pin
+  // souris et clavier : survol / focus d'un pin — ordinateur seulement.
+  // Sur téléphone, le navigateur rejoue des événements souris et focus autour
+  // de l'appui : la fiche apparaissait sous le doigt et le mouseout/focusout
+  // qui suivait la refermait aussitôt, avant que le clic ne l'épingle.
+  // Au doigt, seul l'appui (le clic, plus bas) pilote la fiche.
   zone.addEventListener('mouseover', (e) => {
+    if (MOBILE.matches) return;
     const pin = e.target.closest('.pin');
     if (pin) montrerFiche(pin);
   });
   zone.addEventListener('mouseout', (e) => {
+    if (MOBILE.matches) return;
     if (e.target.closest('.pin') && !ficheEpinglee) cacherFiche();
   });
-
-  // clavier et téléphone : focus / appui sur un pin
   zone.addEventListener('focusin', (e) => {
+    if (MOBILE.matches) return;
     const pin = e.target.closest('.pin');
     if (pin) montrerFiche(pin);
   });
   zone.addEventListener('focusout', (e) => {
+    if (MOBILE.matches) return;
     if (e.target.closest('.pin') && !ficheEpinglee) cacherFiche();
   });
 
